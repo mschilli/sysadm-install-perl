@@ -28,5 +28,5 @@ ok(-f $TMP_FILE, "$TMP_FILE exists");
 # Count all lines containing 'o'
 #####################################################################
 my $count = 0;
-plough(sub { $count++ if /o/ }, "test.dat");
+plough(sub { $count++ if /o/ }, $TMP_FILE);
 is($count, 2, "Counting all lines containing pattern");

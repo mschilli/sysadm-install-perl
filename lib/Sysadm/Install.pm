@@ -6,7 +6,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 use File::Copy;
 use File::Path;
@@ -580,9 +580,7 @@ C<$exit_code> is 0, the command succeeded. If it is different,
 the command failed and $exit_code holds its exit code.
 
 Please note that C<tap()> is limited to single shell commands, it
-won't work with output redirectors (C<ls E<gt>/tmp/foo>), pipes
-(C<ls | grep foo>), or commands concatenated with semicolons
-(C<ls /etc; ls /tmp>).
+won't work with output redirectors (C<ls E<gt>/tmp/foo> 2E<gt>&1).
 
 =cut
 
@@ -596,7 +594,7 @@ sub tap {
 
     DEBUG "tempfile $tmpfile created";
 
-    my $cmd = join ' ', map { qquote($_, ":shell") } @args;
+    my $cmd = join ' ', map { /\s/ ? qquote($_, ":shell") : $_ } @args;
     $cmd = "$cmd 2>$tmpfile |";
     INFO "tapping $cmd";
 

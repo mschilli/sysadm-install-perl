@@ -1,5 +1,5 @@
 ######################################################################
-    Sysadm::Install 0.10
+    Sysadm::Install 0.11
 ######################################################################
 
 NAME
@@ -150,9 +150,7 @@ DESCRIPTION
         $exit_code holds its exit code.
 
         Please note that "tap()" is limited to single shell commands, it
-        won't work with output redirectors ("ls >/tmp/foo"), pipes ("ls |
-        grep foo"), or commands concatenated with semicolons ("ls /etc; ls
-        /tmp").
+        won't work with output redirectors ("ls >/tmp/foo" 2>&1).
 
     "$quoted_string = qquote($string, [$metachars])"
         Put a string in double quotes and escape all sensitive characters so

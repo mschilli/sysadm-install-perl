@@ -2,7 +2,8 @@
 Revision history for Sysadm::Install
 ########################################
 
-TODO: * fix tap(@cmds)
+0.11 (01/11/2005)
+    (ms) tap() quotes args only if needed now (i.e. if they contain blanks)
 
 0.10 (01/09/2005)
     (ms) removed Expect dependency ('require' on demand)

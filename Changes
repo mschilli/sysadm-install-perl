@@ -4,10 +4,12 @@ Revision history for Sysadm::Install
 
 TODO: * fix tap(@cmds)
 
-0.10 (not yet released)
+0.10 (01/09/2005)
     (ms) removed Expect dependency ('require' on demand)
     (ms) added say()
     (ms) added sudo_me() and bin_find()
+    (ms) tap() now returns the exit code as a third parameter. Improved
+         command handling by using qquote() to separate args.
 
 0.09 (12/04/2004)
     (ms) added hammer() and dependency on Expect

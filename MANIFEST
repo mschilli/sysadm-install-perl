@@ -1,5 +1,6 @@
 Changes
 eg/ask
+eg/mkperl
 eg/tap
 eg/untar_in
 lib/Sysadm/Install.pm

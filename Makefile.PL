@@ -2,11 +2,23 @@ use 5.006;
 use ExtUtils::MakeMaker;
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
+
+eval {
+    require Expect;
+};
+
+if($@) {
+    print <<EOT;
+WARNING: Expect not found.
+         You won't be able to use hammer().
+         Install Expect from CPAN later if you want to.
+EOT
+}
+
 WriteMakefile(
     NAME              => 'Sysadm::Install',
     VERSION_FROM      => 'lib/Sysadm/Install.pm', # finds $VERSION
     PREREQ_PM         => {
-        Expect          => undef,
         Log::Log4perl   => undef,
         File::Copy      => undef,
         File::Path      => undef,

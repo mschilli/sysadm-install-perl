@@ -84,7 +84,7 @@ DESCRIPTION
 
     Works with one or more file names.
 
-    "slurp($file)"
+    "my $data = slurp($file)"
     Slurps in the file and returns a scalar with the file's content.
 
     "blurt($data, $file, $append)"

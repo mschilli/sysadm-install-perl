@@ -17,7 +17,6 @@ use File::Spec::Functions qw(rel2abs abs2rel);
 use Archive::Tar;
 use Cwd;
 use File::Temp;
-use Expect;
 
 our @EXPORTABLE = qw(
 cp rmf mkd cd make 
@@ -85,7 +84,7 @@ Sysadm::Install - Typical installation tasks for system administrators
   make("test install");
 
      # run a cmd and tap into stdout and stderr
-  my($stdout, $stderr) = tap("ls -R");
+  my($stdout, $stderr, $exit_code) = tap("ls", "-R");
 
 =head1 DESCRIPTION
 
@@ -573,33 +572,43 @@ sub blurt {
 
 =pod
 
-=item C<($stdout, $stderr) = tap($cmd)>
+=item C<($stdout, $stderr, $exit_code) = tap($cmd, @args)>
 
-Run a command C<$cmd> in the shell, capture STDOUT and STDERR, and
-return them as strings.
+Run a command $cmd in the shell, and pass it @args as args.
+Capture STDOUT and STDERR, and return them as strings. If
+C<$exit_code> is 0, the command succeeded. If it is different,
+the command failed and $exit_code holds its exit code.
+
+Please note that C<tap()> is limited to single shell commands, it
+won't work with output redirectors (C<ls E<gt>/tmp/foo>), pipes
+(C<ls | grep foo>), or commands concatenated with semicolons
+(C<ls /etc; ls /tmp>).
 
 =cut
 
 ###############################################
 sub tap {
 ###############################################
-    my($cmd) = @_;
+    my(@args) = @_;
 
     my $tmpfh   = File::Temp->new(UNLINK => 1, SUFFIX => '.dat');
     my $tmpfile = $tmpfh->filename();
 
     DEBUG "tempfile $tmpfile created";
 
+    my $cmd = join ' ', map { qquote($_, ":shell") } @args;
     $cmd = "$cmd 2>$tmpfile |";
-    INFO "tap $cmd";
+    INFO "tapping $cmd";
 
     open PIPE, $cmd or LOGDIE "open $cmd | failed ($!)";
     my $stdout = join '', <PIPE>;
-    close PIPE or LOGDIE "close $cmd failed ($!)";
+    close PIPE;
+
+    my $exit_code = $?;
 
     my $stderr = slurp($tmpfile);
 
-    return ($stdout, $stderr);
+    return ($stdout, $stderr, $exit_code);
 }
 
 =pod
@@ -742,6 +751,8 @@ ENTER key to accept defaults on prompts.
 sub hammer {
 ######################################
     my(@cmds) = @_;
+
+    require Expect;
 
     my $exp = Expect->new();
     $exp->raw_pty(0);

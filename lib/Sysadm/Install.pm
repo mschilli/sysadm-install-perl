@@ -513,6 +513,9 @@ optional argument, consisting of a string listing  all escapable characters:
 
     => 1212 rocks!
 
+And there's a shortcut for shells: By specifying ':shell' as the
+metacharacters string, qquote() will actually use '!$[]()+?'.
+
 =cut
 
 ###############################################
@@ -522,7 +525,11 @@ sub qquote {
 
     $str =~ s/([\\"])/\\$1/g;
 
-    $str =~ s/([$metas])/\\$1/g if defined $metas;
+    if(defined $metas) {
+        $metas = '!$[]()+?' if $metas eq ":shell";
+        $metas =~ s/\]/\\]/g;
+        $str =~ s/([$metas])/\\$1/g;
+    }
 
     return "\"$str\"";
 }

@@ -18,7 +18,7 @@ EOT
 WriteMakefile(
     NAME              => 'Sysadm::Install',
     VERSION_FROM      => 'lib/Sysadm/Install.pm', # finds $VERSION
-    EXE_FILES         => ['eg/one_liner'],
+    EXE_FILES         => ['eg/one-liner'],
     PREREQ_PM         => {
         Log::Log4perl   => 0,
         File::Copy      => 0,

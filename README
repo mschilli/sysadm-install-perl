@@ -19,12 +19,12 @@ SYNOPSIS
 DESCRIPTION
     Have you ever wished for your installation shell scripts to run
     reproducably, without much programming fuzz, and even with optional
-    logging enabled? Then give shell programming, use Perl.
+    logging enabled? Then give up shell programming, use Perl.
 
     "Sysadm::Install" executes shell-like commands performing typical
     installation tasks: Copying files, extracting tarballs, calling "make".
     It has a "fail once and die" policy, meticulously checking the result of
-    ever operation and calling "die()" immeditatly if anything fails.
+    every operation and calling "die()" immeditatly if anything fails.
 
   FUNCTIONS
     "cp($source, $target)"

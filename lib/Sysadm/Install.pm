@@ -16,9 +16,9 @@ use Cwd;
 
 require Exporter;
 our @ISA = qw(Exporter);
-our @EXPORT = qw(cp rmf mkd cd make cdback download untar);
+our @EXPORT = qw(cp rmf mkd cd make cdback download untar pie slurp blurt);
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 our @DIR_STACK;
 
@@ -38,6 +38,16 @@ Sysadm::Install - Typical installation tasks for system administrators
   cp("/deliver/someproj.tgz", ".");
   untar("someproj.tgz");
   cd("someproj");
+
+     # Write out ...
+  blurt("Builder: Mike\nDate: Today\n", "build.dat");
+
+     # Slurp back in ...
+  my $data = slurp("build.dat");
+
+     # or edit in place ...
+  pie(sub { s/Today/scalar localtime()/ge; $_; }, "build.dat");
+
   make("test install");
 
 =head1 DESCRIPTION
@@ -263,6 +273,93 @@ sub archive_sniff {
     DEBUG "Return $topdir $dir";
 
     return (1, $topdir, $dir);
+}
+
+=pod
+
+=item C<pie($coderef, $filename, ...)>
+
+Simulate "perl -pie 'do something' file". Edits files in-place. Expects
+a reference to a subroutine as its first argument. It will read out the
+file C<$filename> line by line and calls the subroutine setting
+a localized C<$_> to the current line. The return value of the subroutine
+will replace the previous value of the line.
+
+Example:
+
+    # Replace all 'foo's by 'bar' in test.dat
+        pie(sub { s/foo/bar/g; $_; }, "test.dat");
+
+Works with one or more file names.
+
+=cut
+
+###############################################
+sub pie {
+###############################################
+    my($coderef, @files) = @_;
+
+    for my $file (@files) {
+
+        INFO "editing $file in-place";
+
+        my $out = "";
+
+        open FILE, "<$file" or LOGDIE "Cannot open $file ($!)";
+        while(<FILE>) {
+            $out .= $coderef->($_);
+        }
+        close FILE;
+
+        blurt($out, $file);
+    }
+}
+
+=pod
+
+=item C<slurp($file)>
+
+Slurps in the file and returns a scalar with the file's content.
+
+=cut
+
+###############################################
+sub slurp {
+###############################################
+    my($file) = @_;
+
+    INFO "slurping data from $file";
+
+    local $/ = undef;
+
+    open FILE, "<$file" or LOGDIE "Cannot open $file ($!)";
+    my $data = <FILE>;
+    close FILE;
+
+    return $data;
+}
+
+=pod
+
+=item C<blurt($data, $file, $append)>
+
+Opens a new file, prints the data in C<$data> to it and closes the file.
+If C<$append> is set to a true value, data will be appended to the
+file. Default is false, existing files will be overwritten.
+
+=cut
+
+###############################################
+sub blurt {
+###############################################
+    my($data, $file, $append) = @_;
+
+    INFO(($append ? "appending" : "writing") . " data to $file");
+
+    open FILE, ">" . ($append ? ">" : "") . $file 
+        or LOGDIE "Cannot open $file for writing ($!)";
+    print FILE $data;
+    close FILE;
 }
 
 =pod

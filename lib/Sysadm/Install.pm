@@ -106,7 +106,9 @@ Untar the tarball in C<$tgz_file>, which typically adheres to the
 C<someproject-X.XX.tgz> convention. But regardless of whether the 
 archive actually contains a top directory C<someproject-X.XX>,
 this function will behave if it had one. If it doesn't have one,
-a new directory is created before the unpacking takes place.
+a new directory is created before the unpacking takes place. Unpacks
+the tarball into the current directory, no matter where the tarfile
+is located.
 
 =cut
 
@@ -136,6 +138,7 @@ sub untar {
     } else {
         die "no topdir" unless defined $topdir;
         DEBUG "Not-so-nice archive (no topdir), extracting to subdir $topdir";
+        $topdir = basename $topdir;
         rmf($topdir);
         mkd($topdir);
         cd($topdir);
@@ -241,10 +244,11 @@ sub archive_sniff {
 
     DEBUG "Sniffing archive '$name'";
 
-    my ($dir) = ($name =~ /(.*?)\.(tar\.gz|tgz)$/);
+    my ($dir) = ($name =~ /(.*?)\.(tar\.gz|tgz|tar)$/);
  
     return 0 unless defined $dir;
 
+    $dir = basename($dir);
     DEBUG "dir=$dir";
 
     my $topdir;

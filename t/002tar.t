@@ -39,7 +39,7 @@ rmtree "test";
 #####################################################################
 # Test zipped tar
 #####################################################################
-$tarfile = File::Spec->catfile($TEST_DIR, "canned", "test.tgz");
+$tarfile = File::Spec->catfile($TEST_DIR, "canned", "test.tar");
 
 untar($tarfile);
 
@@ -53,7 +53,7 @@ rmtree "test";
 #####################################################################
 # Test zipped tar with different top dir
 #####################################################################
-$tarfile = File::Spec->catfile($TEST_DIR, "canned", "testa.tgz");
+$tarfile = File::Spec->catfile($TEST_DIR, "canned", "testa.tar");
 
 untar($tarfile);
 

@@ -482,7 +482,8 @@ sub tap {
 =item C<$quoted_string = qquote($string, [$metachars])>
 
 Put a string in double quotes and escape all sensitive characters so
-there's no unwanted interpolation. E.g., if you have something like
+there's no unwanted interpolation. 
+E.g., if you have something like
 
    print "foo!\n";
 
@@ -495,7 +496,7 @@ but also the target environment's meta chars. A string containing
 
     print "$<\n";
 
-needs to have the '$' escapted like
+needs to have the '$' escaped like
 
     "print \"\$<\\n\";"
 
@@ -515,6 +516,31 @@ optional argument, consisting of a string listing  all escapable characters:
 
 And there's a shortcut for shells: By specifying ':shell' as the
 metacharacters string, qquote() will actually use '!$[]()+?'.
+
+For example, if you wanted to run the perl code
+
+    print "foobar\n";
+
+via
+
+    perl -e ...
+
+on a box via ssh, you would use
+
+    use Sysadm::Install qw(qquote);
+
+    my $cmd = 'print "foobar!\n"';
+       $cmd = "perl -e " . qquote($cmd, ':shell');
+       $cmd = "ssh somehost " . qquote($cmd, ':shell');
+
+    print "$cmd\n";
+    system($cmd);
+
+and get
+
+    ssh somehost "perl -e \"print \\\"foobar\\\!\\\\n\\\"\""
+
+which runs on C<somehost> without hickup and prints C<foobar!>.
 
 =cut
 

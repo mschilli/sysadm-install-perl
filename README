@@ -40,21 +40,18 @@ DESCRIPTION
     every operation and calling "die()" immeditatly if anything fails.
 
   FUNCTIONS
-
     "cp($source, $target)"
-        Copy a file from "$source" to "$target". "target" can be a
-        directory.
+        Copy a file from $source to $target. "target" can be a directory.
 
     "mv($source, $target)"
-        Move a file from "$source" to "$target". "target" can be a
-        directory.
+        Move a file from $source to $target. "target" can be a directory.
 
     "download($url)"
-        Download a file specified by "$url" and store it under the name
+        Download a file specified by $url and store it under the name
         returned by "basename($url)".
 
     "untar($tgz_file)"
-        Untar the tarball in "$tgz_file", which typically adheres to the
+        Untar the tarball in $tgz_file, which typically adheres to the
         "someproject-X.XX.tgz" convention. But regardless of whether the
         archive actually contains a top directory "someproject-X.XX", this
         function will behave if it had one. If it doesn't have one, a new
@@ -82,9 +79,9 @@ DESCRIPTION
     "pie($coderef, $filename, ...)"
         Simulate "perl -pie 'do something' file". Edits files in-place.
         Expects a reference to a subroutine as its first argument. It will
-        read out the file "$filename" line by line and calls the subroutine
-        setting a localized "$_" to the current line. The return value of
-        the subroutine will replace the previous value of the line.
+        read out the file $filename line by line and calls the subroutine
+        setting a localized $_ to the current line. The return value of the
+        subroutine will replace the previous value of the line.
 
         Example:
 
@@ -109,12 +106,12 @@ DESCRIPTION
         Slurps in the file and returns a scalar with the file's content.
 
     "blurt($data, $file, $append)"
-        Opens a new file, prints the data in "$data" to it and closes the
-        file. If "$append" is set to a true value, data will be appended to
+        Opens a new file, prints the data in $data to it and closes the
+        file. If $append is set to a true value, data will be appended to
         the file. Default is false, existing files will be overwritten.
 
     "($stdout, $stderr) = tap($cmd)"
-        Rund a command "$cmd" in the shell, capture STDOUT and STDERR, and
+        Rund a command $cmd in the shell, capture STDOUT and STDERR, and
         return them as strings.
 
     "$quoted_string = qquote($string, [$metachars])"
@@ -133,7 +130,7 @@ DESCRIPTION
 
             print "$<\n";
 
-        needs to have the '$' escapted like
+        needs to have the '$' escaped like
 
             "print \"\$<\\n\";"
 
@@ -154,6 +151,31 @@ DESCRIPTION
 
         And there's a shortcut for shells: By specifying ':shell' as the
         metacharacters string, qquote() will actually use '!$[]()+?'.
+
+        For example, if you wanted to run the perl code
+
+            print "foobar\n";
+
+        via
+
+            perl -e ...
+
+        on a box via ssh, you would use
+
+            use Sysadm::Install qw(qquote);
+
+            my $cmd = 'print "foobar!\n"';
+               $cmd = "perl -e " . qquote($cmd, ':shell');
+               $cmd = "ssh somehost " . qquote($cmd, ':shell');
+
+            print "$cmd\n";
+            system($cmd);
+
+        and get
+
+            ssh somehost "perl -e \"print \\\"foobar\\\!\\\\n\\\"\""
+
+        which runs on "somehost" without hickup and prints "foobar!".
 
 AUTHOR
     Mike Schilli, <m@perlmeister.com>

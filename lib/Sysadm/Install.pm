@@ -544,6 +544,8 @@ sub slurp {
     my $data = <FILE>;
     close FILE;
 
+    DEBUG "Read ", length($data), " bytes from $file";
+
     return $data;
 }
 

@@ -23,4 +23,4 @@ is($out, "$< rocks!\n", "simple escape");
 $escaped = qquote($script, '!$][)('); # Escape for shell use
 
 $escaped = qquote('[some]$thing(weird)"`', ":shell");
-is($escaped, '"[some]\$thing(weird)\"\`"', ":shell");
+is($escaped, '"[some]\\$thing(weird)\\"\\`"', ":shell");

@@ -22,7 +22,7 @@ our @EXPORTABLE = qw(
 cp rmf mkd cd make 
 cdback download untar 
 pie slurp blurt mv tap 
-plough qquote perm_cp
+plough qquote quote perm_cp
 sysrun untar_in pick ask
 hammer say
 sudo_me bin_find
@@ -579,8 +579,37 @@ Capture STDOUT and STDERR, and return them as strings. If
 C<$exit_code> is 0, the command succeeded. If it is different,
 the command failed and $exit_code holds its exit code.
 
-Please note that C<tap()> is limited to single shell commands, it
-won't work with output redirectors (C<ls E<gt>/tmp/foo> 2E<gt>&1).
+Please note that C<tap()> is limited to single shell
+commands, it won't work with output redirectors (C<ls E<gt>/tmp/foo>
+2E<gt>&1).
+
+In default mode, C<tap()> will concatenate the command and args
+given and create a shell command line by redirecting STDERR to a temporary
+file. C<tap("ls", "/tmp")>, for example, will result in
+
+    'ls' '/tmp' 2>/tmp/sometempfile |
+
+Note that all commands are protected by single quotes to make sure
+arguments containing spaces are processed as singles, and no globbing
+happens on wildcards. Arguments containing single quotes or backslashes
+are escaped properly.
+
+If quoting is undesirable, C<tap()> accepts an option hash as
+its first parameter, 
+
+    tap({no_quotes => 1}, "ls", "/tmp/*");
+
+which will suppress any quoting:
+
+    ls /tmp/* 2>/tmp/sometempfile |
+
+Or, if you prefer double quotes, use
+
+    tap({double_quotes => 1}, "ls", "/tmp/$VAR");
+
+wrapping all args so that shell variables are interpolated properly:
+
+    "ls" "/tmp/$VAR" 2>/tmp/sometempfile |
 
 =cut
 
@@ -589,12 +618,26 @@ sub tap {
 ###############################################
     my(@args) = @_;
 
+    my $opts = {};
+
+    $opts = shift @args if ref $args[0] eq "HASH";
+
     my $tmpfh   = File::Temp->new(UNLINK => 1, SUFFIX => '.dat');
     my $tmpfile = $tmpfh->filename();
 
     DEBUG "tempfile $tmpfile created";
 
-    my $cmd = join ' ', map { /\s/ ? qquote($_, ":shell") : $_ } @args;
+    my $cmd;
+
+    if($opts->{no_quotes}) {
+        $cmd = join ' ', @args;
+    } elsif($opts->{double_quotes}) {
+        $cmd = join ' ', map { qquote($_, ":shell") } @args;
+    } else {
+            # Default mode: Single quotes
+        $cmd = join ' ', map { quote($_) } @args;
+    }
+       
     $cmd = "$cmd 2>$tmpfile |";
     INFO "tapping $cmd";
 
@@ -690,6 +733,30 @@ sub qquote {
     }
 
     return "\"$str\"";
+}
+
+=pod
+
+=item C<$quoted_string = quote($string, [$metachars])>
+
+Similar to C<qquote()>, just puts a string in single quotes.
+
+=cut
+
+###############################################
+sub quote {
+###############################################
+    my($str, $metas) = @_;
+
+    $str =~ s/([\\'])/\\$1/g;
+
+    if(defined $metas) {
+        $metas = '' if $metas eq ":shell";
+        $metas =~ s/\]/\\]/g;
+        $str =~ s/([$metas])/\\$1/g;
+    }
+
+    return "\'$str\'";
 }
 
 =pod

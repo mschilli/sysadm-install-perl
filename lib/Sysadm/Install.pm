@@ -16,7 +16,9 @@ use Cwd;
 
 require Exporter;
 our @ISA = qw(Exporter);
-our @EXPORT = qw(cp rmf mkd cd make cdback download untar pie slurp blurt);
+our @EXPORT = qw(cp rmf mkd cd make cdback download untar pie slurp blurt
+                 mv 
+                );
 
 our $VERSION = '0.04';
 
@@ -80,6 +82,21 @@ sub cp {
 ###############################################
     INFO "cp $_[0] $_[1]";
     File::Copy::copy @_ or LOGDIE "Cannot copy $_[0] to $_[1] ($!)";
+}
+
+=pod
+
+=item C<mv($source, $target)>
+
+Move a file from C<$source> to C<$target>. C<target> can be a directory.
+
+=cut
+
+###############################################
+sub mv {
+###############################################
+    INFO "mv $_[0] $_[1]";
+    File::Copy::move @_ or LOGDIE "Cannot move $_[0] to $_[1] ($!)";
 }
 
 =pod

@@ -40,21 +40,23 @@ DESCRIPTION
     every operation and calling "die()" immeditatly if anything fails.
 
   FUNCTIONS
+
     "cp($source, $target)"
-        Copy a file from $source to $target. "target" can be a directory.
-        Note that "cp" doesn't copy file permissions. If you want the target
-        file to reflect the source file's user rights, use "perm_cp()" shown
-        below.
+        Copy a file from "$source" to "$target". "target" can be a
+        directory. Note that "cp" doesn't copy file permissions. If you want
+        the target file to reflect the source file's user rights, use
+        "perm_cp()" shown below.
 
     "mv($source, $target)"
-        Move a file from $source to $target. "target" can be a directory.
+        Move a file from "$source" to "$target". "target" can be a
+        directory.
 
     "download($url)"
-        Download a file specified by $url and store it under the name
+        Download a file specified by "$url" and store it under the name
         returned by "basename($url)".
 
     "untar($tgz_file)"
-        Untar the tarball in $tgz_file, which typically adheres to the
+        Untar the tarball in "$tgz_file", which typically adheres to the
         "someproject-X.XX.tgz" convention. But regardless of whether the
         archive actually contains a top directory "someproject-X.XX", this
         function will behave if it had one. If it doesn't have one, a new
@@ -63,14 +65,14 @@ DESCRIPTION
         located.
 
     "untar_in($tar_file, $dir)"
-        Untar the tarball in $tgz_file in directory $dir. Create $dir if it
-        doesn't exist yet.
+        Untar the tarball in "$tgz_file" in directory "$dir". Create "$dir"
+        if it doesn't exist yet.
 
     "pick($prompt, $options, $default)"
-        Ask the user to pick an item from a displayed list. $prompt is the
-        text displayed, $options is a referenc to an array of choices, and
-        $default is the number (starting from 1, not 0) of the default item.
-        For example,
+        Ask the user to pick an item from a displayed list. "$prompt" is the
+        text displayed, "$options" is a referenc to an array of choices, and
+        "$default" is the number (starting from 1, not 0) of the default
+        item. For example,
 
             pick("Pick a fruit", ["apple", "pear", "pineapple"], 3);
 
@@ -85,8 +87,8 @@ DESCRIPTION
         be returned. Note that 3 marks the 3rd element of the list, and is
         *not* an index value into the array.
 
-        If the user enters 1, 2 or 3, the corresponding text string
-        ("apple", "pear", "pineapple" will be returned by "pick()".
+        If the user enters "1", "2" or "3", the corresponding text string
+        (""apple"", ""pear"", ""pineapple"" will be returned by "pick()".
 
     "ask($prompt, $default)"
         Ask the user to either hit *Enter* and select the displayed default
@@ -112,9 +114,9 @@ DESCRIPTION
     "pie($coderef, $filename, ...)"
         Simulate "perl -pie 'do something' file". Edits files in-place.
         Expects a reference to a subroutine as its first argument. It will
-        read out the file $filename line by line and calls the subroutine
-        setting a localized $_ to the current line. The return value of the
-        subroutine will replace the previous value of the line.
+        read out the file "$filename" line by line and calls the subroutine
+        setting a localized "$_" to the current line. The return value of
+        the subroutine will replace the previous value of the line.
 
         Example:
 
@@ -139,12 +141,12 @@ DESCRIPTION
         Slurps in the file and returns a scalar with the file's content.
 
     "blurt($data, $file, $append)"
-        Opens a new file, prints the data in $data to it and closes the
-        file. If $append is set to a true value, data will be appended to
+        Opens a new file, prints the data in "$data" to it and closes the
+        file. If "$append" is set to a true value, data will be appended to
         the file. Default is false, existing files will be overwritten.
 
     "($stdout, $stderr) = tap($cmd)"
-        Run a command $cmd in the shell, capture STDOUT and STDERR, and
+        Run a command "$cmd" in the shell, capture STDOUT and STDERR, and
         return them as strings.
 
     "$quoted_string = qquote($string, [$metachars])"
@@ -211,11 +213,13 @@ DESCRIPTION
         which runs on "somehost" without hickup and prints "foobar!".
 
     "perm_cp($src, $dst, ...)"
-        Read the $src file's user permissions and modify all $dst files to
-        reflect the same permissions.
+        Read the "$src" file's user permissions and modify all "$dst" files
+        to reflect the same permissions.
 
     "sysrun($cmd)"
-        Run a shell command via "system()" and die() if it fails.
+        Run a shell command via "system()" and die() if it fails. Also works
+        with a list of arguments, which are then interpreted as program name
+        plus arguments, just like "system()" does it.
 
     "hammer($cmd, $arg, ...)"
         Run a command in the shell and simulate a user hammering the ENTER
@@ -223,6 +227,21 @@ DESCRIPTION
 
     "say($text, ...)"
         Alias for "print ..., "\n"", just like Perl6 is going to provide it.
+
+    "sudo_me()"
+        Check if the current script is running as root. If yes, continue. If
+        not, restart the current script with all command line arguments is
+        restarted under sudo:
+
+            sudo scriptname args ...
+
+        Make sure to call this before any "@ARGV"-modifying functions like
+        "getopts()" have kicked in.
+
+    "bin_find($program)"
+        Search all directories in $PATH (the ENV variable) for an executable
+        named $program and return the full path of the first hit. Returns
+        "undef" if the program can't be found.
 
 AUTHOR
     Mike Schilli, <m@perlmeister.com>

@@ -117,6 +117,11 @@ installation tasks: Copying files, extracting tarballs, calling C<make>.
 It has a C<fail once and die> policy, meticulously checking the result
 of every operation and calling C<die()> immeditatly if anything fails.
 
+C<Sysadm::Install> also supports a I<dry_run> mode, in which it 
+logs everything, but suppresses any write actions. Dry run mode
+is enabled by calling C<Sysadm::Install::dry_run(1)>. To switch
+back to normal, call C<Sysadm::Install::dry_run(0)>.
+
 =head2 FUNCTIONS
 
 =over 4

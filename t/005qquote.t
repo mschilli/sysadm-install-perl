@@ -2,7 +2,7 @@
 # Tests for Sysadm::Install/s plough
 #############################################
 
-use Test::More tests => 3;
+use Test::More tests => 4;
 
 use Sysadm::Install qw(:all);
 
@@ -22,5 +22,10 @@ is($out, "$< rocks!\n", "simple escape");
 
 $escaped = qquote($script, '!$][)('); # Escape for shell use
 
+    # shell escape
 $escaped = qquote('[some]$thing(weird)"`', ":shell");
 is($escaped, '"[some]\\$thing(weird)\\"\\`"', ":shell");
+
+    # single quote
+$escaped = quote("[some]\$thing(weird)'`");
+is($escaped, "'[some]\$thing(weird)\\'`'", "single quote");

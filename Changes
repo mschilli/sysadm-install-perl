@@ -3,7 +3,8 @@ Revision history for Sysadm::Install
 ########################################
 
 0.11 (01/11/2005)
-    (ms) tap() quotes args only if needed now (i.e. if they contain blanks)
+    (ms) tap() single-quotes args now by default
+    (ms) tap() allows for optional double-quoting or no-quoting
 
 0.10 (01/09/2005)
     (ms) removed Expect dependency ('require' on demand)

@@ -26,6 +26,7 @@ pie slurp blurt mv tap
 plough qquote perm_cp
 sysrun untar_in pick ask
 hammer say
+sudo_me bin_find
 );
 
 our %EXPORTABLE = map { $_ => 1 } @EXPORTABLE;
@@ -764,6 +765,62 @@ Alias for C<print ..., "\n">, just like Perl6 is going to provide it.
 sub say {
 ######################################
     print @_, "\n";
+}
+
+=pod
+
+=item C<sudo_me()>
+
+Check if the current script is running as root. If yes, continue. If not,
+restart the current script with all command line arguments is restarted
+under sudo:
+
+    sudo scriptname args ...
+
+Make sure to call this before any C<@ARGV>-modifying functions like
+C<getopts()> have kicked in.
+
+=cut
+
+######################################
+sub sudo_me {
+######################################
+    my($argv) = @_;
+
+    $argv = \@ARGV unless $argv;
+
+       # If we're not running as root, 
+       # re-invoke the script via sudo
+    if($> != 0) {
+        DEBUG "Not running as root, calling sudo $0 @$argv";
+        my $sudo = bin_find("sudo");
+        LOGDIE "Can't find sudo in PATH" unless $sudo;
+        exec($sudo, $0, @$argv) or LOGDIE "exec failed!";
+    }
+}
+
+=pod
+
+=item C<bin_find($program)>
+
+Search all directories in $PATH (the ENV variable) for an executable
+named $program and return the full path of the first hit. Returns
+C<undef> if the program can't be found.
+
+=cut
+
+######################################
+sub bin_find {
+######################################
+    my($exe) = @_;
+
+    for my $path (split /:/, $ENV{PATH}) {
+        my $full = File::Spec->catfile($path, $exe);
+
+        return $full if -x $full;
+    }
+
+    return undef;
 }
 
 =pod

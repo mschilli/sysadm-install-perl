@@ -2,6 +2,9 @@
 Revision history for Sysadm::Install
 ########################################
 
+0.09 (not yet released)
+    (ms) added hammer() and dependency on Expect
+
 0.08 (11/24/2004)
     (ms) added perm_cp() to copy file permissions
     (ms) added untar_in() to untar tarballs in specified directories

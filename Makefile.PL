@@ -6,6 +6,7 @@ WriteMakefile(
     NAME              => 'Sysadm::Install',
     VERSION_FROM      => 'lib/Sysadm/Install.pm', # finds $VERSION
     PREREQ_PM         => {
+        Expect          => undef,
         Log::Log4perl   => undef,
         File::Copy      => undef,
         File::Path      => undef,

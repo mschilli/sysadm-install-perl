@@ -6,7 +6,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 use File::Copy;
 use File::Path;
@@ -746,7 +746,7 @@ sub hammer {
     INFO "spawning: @cmds";
     $exp->spawn(@cmds);
 
-    $exp->send_slow(0, "\n") for 1..999;
+    $exp->send_slow(0, "\n") for 1..99;
 
         # Wait until program finishes
     $exp->expect(undef);

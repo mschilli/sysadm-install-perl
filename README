@@ -1,5 +1,5 @@
 ######################################################################
-    Sysadm::Install 0.08
+    Sysadm::Install 0.09
 ######################################################################
 
 NAME
@@ -216,6 +216,10 @@ DESCRIPTION
 
     "sysrun($cmd)"
         Run a shell command via "system()" and die() if it fails.
+
+    "hammer($cmd, $arg, ...)"
+        Run a command in the shell and simulate a user hammering the ENTER
+        key to accept defaults on prompts.
 
 AUTHOR
     Mike Schilli, <m@perlmeister.com>

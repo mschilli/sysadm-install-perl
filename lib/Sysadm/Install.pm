@@ -765,6 +765,17 @@ and get
 
 which runs on C<somehost> without hickup and prints C<foobar!>.
 
+Sysadm::Install comes with a script C<one-liner> (installed in bin),
+which takes arbitrary perl code on STDIN and transforms it into
+a one-liner:
+
+    $ one-liner
+    Type perl code, terminate by CTRL-D
+    print "hello\n";
+    print "world\n";
+    ^D
+    perl -e "print \"hello\\n\"; print \"world\\n\"; "
+
 =cut
 
 ###############################################

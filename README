@@ -1,5 +1,5 @@
 ######################################################################
-    Sysadm::Install 0.13
+    Sysadm::Install 0.14
 ######################################################################
 
 NAME
@@ -250,6 +250,15 @@ DESCRIPTION
         Read the $src file's user permissions and modify all $dst files to
         reflect the same permissions.
 
+    "$perms = perm_get($filename)"
+        Read the $filename's user permissions and owner/group. Returns an
+        array ref to be used later when calling "perm_set($filename,
+        $perms)".
+
+    "perm_set($filename, $perms)"
+        Set file permissions and owner of $filename according to $perms,
+        which was previously acquired by calling "perm_get($filename)".
+
     "sysrun($cmd)"
         Run a shell command via "system()" and die() if it fails. Also works
         with a list of arguments, which are then interpreted as program name
@@ -300,7 +309,7 @@ AUTHOR
     Mike Schilli, <m@perlmeister.com>
 
 COPYRIGHT AND LICENSE
-    Copyright (C) 2004 by Mike Schilli
+    Copyright (C) 2004, 2005 by Mike Schilli
 
     This library is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself, either Perl version 5.8.3 or, at

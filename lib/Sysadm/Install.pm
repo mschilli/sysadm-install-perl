@@ -6,7 +6,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 use File::Copy;
 use File::Path;
@@ -17,6 +17,25 @@ use File::Spec::Functions qw(rel2abs abs2rel);
 use Archive::Tar;
 use Cwd;
 use File::Temp;
+
+our $DRY_RUN;
+our $DRY_RUN_MSG;
+
+dry_run(0);
+
+###############################################
+sub dry_run {
+###############################################
+    my($on) = @_;
+
+    if($on) {
+        $DRY_RUN     = 1;
+        $DRY_RUN_MSG = "(skipped - dry run)";
+    } else {
+        $DRY_RUN     = 0;
+        $DRY_RUN_MSG = "";
+    }
+}
 
 our @EXPORTABLE = qw(
 cp rmf mkd cd make 
@@ -118,7 +137,8 @@ shown below.
 ###############################################
 sub cp {
 ###############################################
-    INFO "cp $_[0] $_[1]";
+    INFO "cp $_[0] $_[1] $DRY_RUN_MSG";
+    return 1 if $DRY_RUN;
     File::Copy::copy @_ or LOGDIE "Cannot copy $_[0] to $_[1] ($!)";
 }
 
@@ -133,7 +153,8 @@ Move a file from C<$source> to C<$target>. C<target> can be a directory.
 ###############################################
 sub mv {
 ###############################################
-    INFO "mv $_[0] $_[1]";
+    INFO "mv $_[0] $_[1] $DRY_RUN_MSG";
+    return 1 if $DRY_RUN;
     File::Copy::move @_ or LOGDIE "Cannot move $_[0] to $_[1] ($!)";
 }
 
@@ -149,7 +170,8 @@ name returned by C<basename($url)>.
 ###############################################
 sub download {
 ###############################################
-    INFO "Downloading $_[0] => ", basename($_[0]);
+    INFO "Downloading $_[0] => ", basename($_[0]), " $DRY_RUN_MSG";
+    return 1 if $DRY_RUN;
     getstore($_[0], basename($_[0])) or LOGDIE "Cannot download $_[0] ($!)";
 }
 
@@ -173,7 +195,8 @@ sub untar {
     die "untar called without defined tarfile" unless @_ == 1 
          and defined $_[0];
 
-    INFO "untar $_[0]";
+    INFO "untar $_[0] $DRY_RUN_MSG";
+    return 1 if $DRY_RUN;
 
     my($nice, $topdir, $namedir) = archive_sniff($_[0]);
 
@@ -221,12 +244,14 @@ sub untar_in {
     LOGDIE "not enough arguments" if
       ! defined $tar_file or ! defined $dir;
 
+    INFO "Untarring $tar_file in $dir $DRY_RUN_MSG";
+    return 1 if $DRY_RUN;
+
     mkd($dir) unless -d $dir;
 
     my $tar_file_abs = rel2abs($tar_file, dirname($tar_file));
 
     cd($dir);
-    INFO "Untarring $tar_file_abs in $dir";
     my $arch = Archive::Tar->new("$tar_file_abs");
     $arch->extract() or LOGDIE "Extract failed: $!";
     cdback();
@@ -332,7 +357,8 @@ Create a directory of arbitrary depth, just like C<File::Path::mkpath>.
 ###############################################
 sub mkd {
 ###############################################
-    INFO "mkd @_";
+    INFO "mkd @_ $DRY_RUN_MSG";
+    return 1 if $DRY_RUN;
     mkpath @_ or LOGDIE "Cannot mkdir @_ ($!)";
 }
 
@@ -348,7 +374,9 @@ in the shell.
 ###############################################
 sub rmf {
 ###############################################
-    INFO "rmf $_[0]";
+    INFO "rmf $_[0] $DRY_RUN_MSG";
+    return 1 if $DRY_RUN;
+
     if(!-e $_[0]) {
         DEBUG "$_[0] doesn't exist - ignored";
         return;
@@ -368,6 +396,7 @@ chdir to the given directory.
 sub cd {
 ###############################################
     INFO "cd $_[0]";
+
     push @DIR_STACK, getcwd();
     chdir($_[0]) or LOGDIE("Cannot cd $_[0] ($!)");
 }
@@ -401,7 +430,9 @@ Call C<make> in the shell.
 ###############################################
 sub make {
 ###############################################
-    INFO "make @_";
+    INFO "make @_ $DRY_RUN_MSG";
+    return 1 if $DRY_RUN;
+
     system("make @_") and LOGDIE "Cannot make @_ ($!)";
 }
 
@@ -475,7 +506,8 @@ sub pie {
 
     for my $file (@files) {
 
-        INFO "editing $file in-place";
+        INFO "editing $file in-place $DRY_RUN_MSG";
+        next if $DRY_RUN;
 
         my $out = "";
 
@@ -512,7 +544,8 @@ sub plough {
 
     for my $file (@files) {
 
-        INFO "Ploughing through $file";
+        INFO "Ploughing through $file $DRY_RUN_MSG";
+        next if $DRY_RUN;
 
         my $out = "";
 
@@ -566,7 +599,8 @@ sub blurt {
     my($data, $file, $append) = @_;
 
     INFO(($append ? "appending" : "writing") . " " .
-         length($data) . " bytes to $file");
+         length($data) . " bytes to $file $DRY_RUN_MSG");
+    return 1 if $DRY_RUN;
 
     open FILE, ">" . ($append ? ">" : "") . $file 
         or LOGDIE "Cannot open $file for writing ($!)";
@@ -621,6 +655,11 @@ wrapping all args so that shell variables are interpolated properly:
 sub tap {
 ###############################################
     my(@args) = @_;
+
+    if($DRY_RUN) {
+        INFO "tapping @args $DRY_RUN_MSG";
+        return 1;
+    }
 
     my $opts = {};
 
@@ -778,11 +817,60 @@ sub perm_cp {
     # Lifted from Ben Okopnik's
     # http://www.linuxgazette.com/issue87/misc/tips/cpmod.pl.txt
 
+    INFO "perm_cp @_ $DRY_RUN_MSG";
+    return 1 if $DRY_RUN;
+
     LOGDIE("usage: perm_cp src dst ...") if @_ < 2;
 
-    my @perms = (stat shift)[2,4,5];
-    chown @perms[1,2],          @_;
-    chmod $perms[0] & 07777,    @_;
+    my $perms = perm_get($_[0]);
+    perm_set($_[1], $perms);
+}
+
+=pod
+
+=item C<$perms = perm_get($filename)>
+
+Read the C<$filename>'s user permissions and owner/group. 
+Returns an array ref to be
+used later when calling C<perm_set($filename, $perms)>.
+
+=cut 
+
+######################################
+sub perm_get {
+######################################
+    my($filename) = @_;
+
+    my @stats = (stat $filename)[2,4,5] or
+        LOGDIE "Cannot stat $filename ($!)";
+
+    INFO "perm_get $filename (@stats)";
+
+    return \@stats;
+}
+
+=pod
+
+=item C<perm_set($filename, $perms)>
+
+Set file permissions and owner of C<$filename>
+according to C<$perms>, which was previously
+acquired by calling C<perm_get($filename)>.
+
+=cut 
+
+######################################
+sub perm_set {
+######################################
+    my($filename, $perms) = @_;
+
+    INFO "perm_set $filename (@$perms) $DRY_RUN_MSG";
+    return 1 if $DRY_RUN;
+
+    chown($perms->[1], $perms->[2], $filename) or 
+        LOGDIE "Cannot chown $filename ($!)";
+    chmod($perms->[0] & 07777,    $filename) or
+        LOGDIE "Cannot chmod $filename ($!)";
 }
 
 =pod
@@ -800,9 +888,10 @@ sub sysrun {
 ######################################
     my(@cmds) = @_;
 
-    LOGDIE("usage: sysrun cmd ...") if @_ < 1;
+    INFO "sysrun: @cmds $DRY_RUN_MSG";
+    return 1 if $DRY_RUN;
 
-    INFO "sysrun: @cmds";
+    LOGDIE("usage: sysrun cmd ...") if @_ < 1;
 
     system(@cmds) and LOGDIE "@cmds failed ($!)";
 }
@@ -822,6 +911,11 @@ sub hammer {
     my(@cmds) = @_;
 
     require Expect;
+
+    if($DRY_RUN) {
+        INFO "Hammer: @cmds $DRY_RUN_MSG";
+        return 1 if $DRY_RUN;
+    }
 
     my $exp = Expect->new();
     $exp->raw_pty(0);
@@ -866,6 +960,11 @@ C<getopts()> have kicked in.
 sub sudo_me {
 ######################################
     my($argv) = @_;
+
+    if($DRY_RUN) {
+        INFO "sudo_me $DRY_RUN_MSG";
+        return 1;
+    }
 
     $argv = \@ARGV unless $argv;
 

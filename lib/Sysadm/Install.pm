@@ -6,7 +6,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use File::Copy;
 use File::Path;
@@ -21,7 +21,7 @@ our @EXPORTABLE = qw(
 cp rmf mkd cd make 
 cdback download untar 
 pie slurp blurt mv tap 
-plough qquote
+plough qquote perm_cp
 );
 
 our %EXPORTABLE = map { $_ => 1 } @EXPORTABLE;
@@ -104,6 +104,9 @@ of every operation and calling C<die()> immeditatly if anything fails.
 =item C<cp($source, $target)>
 
 Copy a file from C<$source> to C<$target>. C<target> can be a directory.
+Note that C<cp> doesn't copy file permissions. If you want the target
+file to reflect the source file's user rights, use C<perm_cp()>
+shown below.
 
 =cut
 
@@ -558,6 +561,28 @@ sub qquote {
     }
 
     return "\"$str\"";
+}
+
+=pod
+
+=item C<perm_cp($src, $dst, ...)>
+
+Read the C<$src> file's user permissions and modify all
+C<$dst> files to reflect the same permissions.
+
+=cut
+
+######################################
+sub perm_cp {
+######################################
+    # Lifted from Ben Okopnik's
+    # http://www.linuxgazette.com/issue87/misc/tips/cpmod.pl.txt
+
+    LOGDIE("usage: perm_cp src dst ...") if @_ < 2;
+
+    my @perms = (stat shift)[2,4,5];
+    chown @perms[1,2],          @_;
+    chmod $perms[0] & 07777,    @_;
 }
 
 =pod

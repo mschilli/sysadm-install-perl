@@ -1,6 +1,7 @@
 Changes
+lib/Sysadm/Install.pm
 Makefile.PL
 MANIFEST
+MANIFEST.SKIP
 README
 t/001.t
-lib/Sysadm/Install.pm

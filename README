@@ -51,7 +51,9 @@ DESCRIPTION
         "someproject-X.XX.tgz" convention. But regardless of whether the
         archive actually contains a top directory "someproject-X.XX", this
         function will behave if it had one. If it doesn't have one, a new
-        directory is created before the unpacking takes place.
+        directory is created before the unpacking takes place. Unpacks the
+        tarball into the current directory, no matter where the tarfile is
+        located.
 
     "mkd($dir)"
         Create a directory of arbitrary depth, just like

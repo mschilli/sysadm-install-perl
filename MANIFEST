@@ -3,6 +3,6 @@ lib/Sysadm/Install.pm
 Makefile.PL
 MANIFEST
 MANIFEST.SKIP
+META.yml			Module meta-data (added by MakeMaker)
 README
 t/001.t
-META.yml                                 Module meta-data (added by MakeMaker)

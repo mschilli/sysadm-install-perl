@@ -20,7 +20,8 @@ use File::Temp;
 our @EXPORTABLE = qw(
 cp rmf mkd cd make 
 cdback download untar 
-pie slurp blurt mv tap
+pie slurp blurt mv tap 
+plough
 );
 
 our %EXPORTABLE = map { $_ => 1 } @EXPORTABLE;
@@ -360,6 +361,41 @@ sub pie {
         close FILE;
 
         blurt($out, $file);
+    }
+}
+
+=pod
+
+=item C<plough($coderef, $filename, ...)>
+
+Simulate "perl -ne 'do something' file". Iterates over all lines
+of all input files and calls the subroutine provided as the first argument. 
+
+Example:
+
+    # Print all lines containing 'foobar'
+        plough(sub { print if /foobar/ }, "test.dat");
+
+Works with one or more file names.
+
+=cut
+
+###############################################
+sub plough {
+###############################################
+    my($coderef, @files) = @_;
+
+    for my $file (@files) {
+
+        INFO "Ploughing through $file";
+
+        my $out = "";
+
+        open FILE, "<$file" or LOGDIE "Cannot open $file ($!)";
+        while(<FILE>) {
+            $coderef->($_);
+        }
+        close FILE;
     }
 }
 

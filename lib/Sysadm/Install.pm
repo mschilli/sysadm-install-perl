@@ -6,7 +6,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use File::Copy;
 use File::Path;
@@ -21,7 +21,7 @@ our @EXPORTABLE = qw(
 cp rmf mkd cd make 
 cdback download untar 
 pie slurp blurt mv tap 
-plough
+plough qquote
 );
 
 our %EXPORTABLE = map { $_ => 1 } @EXPORTABLE;
@@ -475,6 +475,56 @@ sub tap {
     my $stderr = slurp($tmpfile);
 
     return ($stdout, $stderr);
+}
+
+=pod
+
+=item C<$quoted_string = qquote($string, [$metachars])>
+
+Put a string in double quotes and escape all sensitive characters so
+there's no unwanted interpolation. E.g., if you have something like
+
+   print "foo!\n";
+
+and want to put it into a double-quoted string, it will look like
+
+    "print \"foo!\\n\""
+
+Sometimes, not only backslashes and double quotes need to be escaped,
+but also the target environment's meta chars. A string containing
+
+    print "$<\n";
+
+needs to have the '$' escapted like
+
+    "print \"\$<\\n\";"
+
+if you want to reuse it later in a shell context:
+
+    $ perl -le "print \"\$<\\n\";"
+    1212
+
+C<qquote()> supports escaping these extra characters with its second,
+optional argument, consisting of a string listing  all escapable characters:
+
+    my $script  = 'print "$< rocks!\\n";';
+    my $escaped = qquote($script, '!$'); # Escape for shell use
+    system("perl -e $escaped");
+
+    => 1212 rocks!
+
+=cut
+
+###############################################
+sub qquote {
+###############################################
+    my($str, $metas) = @_;
+
+    $str =~ s/([\\"])/\\$1/g;
+
+    $str =~ s/([$metas])/\\$1/g if defined $metas;
+
+    return "\"$str\"";
 }
 
 =pod

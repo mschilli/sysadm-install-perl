@@ -5,3 +5,4 @@ MANIFEST
 MANIFEST.SKIP
 README
 t/001.t
+META.yml                                 Module meta-data (added by MakeMaker)

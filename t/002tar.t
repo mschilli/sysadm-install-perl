@@ -4,7 +4,7 @@
 
 use Test::More tests => 9;
 
-use Sysadm::Install;
+use Sysadm::Install qw(:all);
 use File::Spec;
 use File::Path;
 #use Log::Log4perl qw(:easy);

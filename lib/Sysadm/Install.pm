@@ -18,7 +18,7 @@ require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT = qw(cp rmf mkd cd make cdback download untar pie slurp blurt);
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 our @DIR_STACK;
 

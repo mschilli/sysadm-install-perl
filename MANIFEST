@@ -15,5 +15,6 @@ t/003slurp.t
 t/004plough.t
 t/005qquote.t
 t/006perm.t
+t/007fs.t
 t/canned/test.tar
 t/canned/testa.tar

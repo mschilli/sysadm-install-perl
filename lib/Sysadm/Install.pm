@@ -232,8 +232,6 @@ sub make {
 
 =pod
 
-=back
-
 =cut
 
 #######################################
@@ -363,6 +361,8 @@ sub blurt {
 }
 
 =pod
+
+=back
 
 =head1 AUTHOR
 

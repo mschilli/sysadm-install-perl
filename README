@@ -71,26 +71,26 @@ DESCRIPTION
         Call "make" in the shell.
 
     "pie($coderef, $filename, ...)"
-    Simulate "perl -pie 'do something' file". Edits files in-place. Expects
-    a reference to a subroutine as its first argument. It will read out the
-    file "$filename" line by line and calls the subroutine setting a
-    localized "$_" to the current line. The return value of the subroutine
-    will replace the previous value of the line.
+        Simulate "perl -pie 'do something' file". Edits files in-place.
+        Expects a reference to a subroutine as its first argument. It will
+        read out the file "$filename" line by line and calls the subroutine
+        setting a localized "$_" to the current line. The return value of
+        the subroutine will replace the previous value of the line.
 
-    Example:
+        Example:
 
-        # Replace all 'foo's by 'bar' in test.dat
-            pie(sub { s/foo/bar/g; $_; }, "test.dat");
+            # Replace all 'foo's by 'bar' in test.dat
+                pie(sub { s/foo/bar/g; $_; }, "test.dat");
 
-    Works with one or more file names.
+        Works with one or more file names.
 
     "my $data = slurp($file)"
-    Slurps in the file and returns a scalar with the file's content.
+        Slurps in the file and returns a scalar with the file's content.
 
     "blurt($data, $file, $append)"
-    Opens a new file, prints the data in "$data" to it and closes the file.
-    If "$append" is set to a true value, data will be appended to the file.
-    Default is false, existing files will be overwritten.
+        Opens a new file, prints the data in "$data" to it and closes the
+        file. If "$append" is set to a true value, data will be appended to
+        the file. Default is false, existing files will be overwritten.
 
 AUTHOR
     Mike Schilli, <m@perlmeister.com>

@@ -6,7 +6,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 use File::Copy;
 use File::Path;
@@ -25,7 +25,7 @@ cdback download untar
 pie slurp blurt mv tap 
 plough qquote perm_cp
 sysrun untar_in pick ask
-hammer
+hammer say
 );
 
 our %EXPORTABLE = map { $_ => 1 } @EXPORTABLE;
@@ -748,6 +748,20 @@ sub hammer {
 
     $exp->send_slow(0.1, "\n") for 1..199;
     $exp->expect(undef);
+}
+
+=pod
+
+=item C<say($text, ...)>
+
+Alias for C<print ..., "\n">, just like Perl6 is going to provide it.
+
+=cut
+
+######################################
+sub say {
+######################################
+    print @_, "\n";
 }
 
 =pod

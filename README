@@ -1,5 +1,5 @@
 ######################################################################
-    Sysadm::Install 0.09
+    Sysadm::Install 0.10
 ######################################################################
 
 NAME
@@ -220,6 +220,9 @@ DESCRIPTION
     "hammer($cmd, $arg, ...)"
         Run a command in the shell and simulate a user hammering the ENTER
         key to accept defaults on prompts.
+
+    "say($text, ...)"
+        Alias for "print ..., "\n"", just like Perl6 is going to provide it.
 
 AUTHOR
     Mike Schilli, <m@perlmeister.com>

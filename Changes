@@ -2,6 +2,9 @@
 Revision history for Sysadm::Install
 ########################################
 
+0.10 (not yet released)
+    (ms) added say()
+
 0.09 (12/04/2004)
     (ms) added hammer() and dependency on Expect
     (ms) corrected shell escapes with qquote()

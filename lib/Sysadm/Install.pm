@@ -6,7 +6,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use File::Copy;
 use File::Path;
@@ -26,6 +26,7 @@ plough qquote quote perm_cp
 sysrun untar_in pick ask
 hammer say
 sudo_me bin_find
+fs_read_open fs_write_open pipe_copy
 );
 
 our %EXPORTABLE = map { $_ => 1 } @EXPORTABLE;
@@ -900,6 +901,103 @@ sub bin_find {
     }
 
     return undef;
+}
+
+=pod
+
+=item C<fs_read_open($dir)>
+
+Opens a file handle to read the output of the following process:
+
+    cd $dir; find ./ -xdev -print0 | cpio -o0 |
+
+This can be used to capture a file system structure. 
+
+=cut
+
+######################################
+sub fs_read_open {
+######################################
+    my($dir) = @_;
+
+    my $find = bin_find("find");
+    LOGDIE "Cannot find 'find'" unless defined $find;
+
+    my $cpio = bin_find("cpio");
+    LOGDIE "Cannot find 'cpio'" unless defined $cpio;
+
+    cd $dir;
+ 
+    my $cmd = "$find . -xdev -print0 | $cpio -o0 --quiet 2>/dev/null ";
+
+    DEBUG "Reading from $cmd";
+    open my $in, "$cmd |" or LOGDIE "Cannot open $cmd";
+
+    cdback;
+
+    return $in;
+}
+
+=pod
+
+=item C<fs_write_open($dir)>
+
+Opens a file handle to write to a 
+
+    | (cd $dir; cpio -i0)
+
+process to restore a file system structure. To be used in conjunction
+with I<fs_read_open>.
+
+=cut
+
+######################################
+sub fs_write_open {
+######################################
+    my($dir) = @_;
+
+    my $cpio = bin_find("cpio");
+    LOGDIE "Cannot find 'cpio'" unless defined $cpio;
+
+    mkd $dir unless -d $dir;
+
+    cd $dir;
+
+    my $cmd = "$cpio -i0 --quiet";
+
+    DEBUG "Writing to $cmd in dir $dir";
+    open my $out, "| $cmd" or LOGDIE "Cannot open $cmd";
+
+    cdback;
+
+    return $out;
+}
+
+=pod
+
+=item C<pipe_copy($in, $out, [$bufsize])>
+
+Reads from $in and writes to $out, using sysread and syswrite. The
+buffer size used defaults to 4096, but can be set explicitely.
+
+=cut
+
+######################################
+sub pipe_copy {
+######################################
+    my($in, $out, $bufsize) = @_;
+
+    $bufsize ||= 4096;
+    my $bytes = 0;
+
+    INFO "Opening pipe (bufsize=$bufsize)";
+
+    while(sysread($in, my $buf, $bufsize)) {
+        $bytes += length $buf;
+        syswrite $out, $buf;
+    }
+
+    INFO "Closed pipe (bufsize=$bufsize, transferred=$bytes)";
 }
 
 =pod

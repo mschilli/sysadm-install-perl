@@ -2,6 +2,9 @@
 Revision history for Sysadm::Install
 ########################################
 
+0.12 (01/15/2005)
+    (ms) Added fs_read_open(), fs_write_open() and pipe_copy()
+
 0.11 (01/11/2005)
     (ms) tap() single-quotes args now by default
     (ms) tap() allows for optional double-quoting or no-quoting

@@ -2,6 +2,9 @@
 Revision history for Sysadm::Install
 ########################################
 
+0.06 (11/04/2004)
+    (ms) added plough
+
 0.05 (10/16/2004)
     (ms) added mv
     (ms) Functions not exported by default anymore. Use

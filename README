@@ -1,5 +1,5 @@
 ######################################################################
-    Sysadm::Install 0.05
+    Sysadm::Install 0.06
 ######################################################################
 
 NAME
@@ -40,18 +40,21 @@ DESCRIPTION
     every operation and calling "die()" immeditatly if anything fails.
 
   FUNCTIONS
+
     "cp($source, $target)"
-        Copy a file from $source to $target. "target" can be a directory.
+        Copy a file from "$source" to "$target". "target" can be a
+        directory.
 
     "mv($source, $target)"
-        Move a file from $source to $target. "target" can be a directory.
+        Move a file from "$source" to "$target". "target" can be a
+        directory.
 
     "download($url)"
-        Download a file specified by $url and store it under the name
+        Download a file specified by "$url" and store it under the name
         returned by "basename($url)".
 
     "untar($tgz_file)"
-        Untar the tarball in $tgz_file, which typically adheres to the
+        Untar the tarball in "$tgz_file", which typically adheres to the
         "someproject-X.XX.tgz" convention. But regardless of whether the
         archive actually contains a top directory "someproject-X.XX", this
         function will behave if it had one. If it doesn't have one, a new
@@ -79,9 +82,9 @@ DESCRIPTION
     "pie($coderef, $filename, ...)"
         Simulate "perl -pie 'do something' file". Edits files in-place.
         Expects a reference to a subroutine as its first argument. It will
-        read out the file $filename line by line and calls the subroutine
-        setting a localized $_ to the current line. The return value of the
-        subroutine will replace the previous value of the line.
+        read out the file "$filename" line by line and calls the subroutine
+        setting a localized "$_" to the current line. The return value of
+        the subroutine will replace the previous value of the line.
 
         Example:
 
@@ -90,16 +93,28 @@ DESCRIPTION
 
         Works with one or more file names.
 
+    "plough($coderef, $filename, ...)"
+        Simulate "perl -ne 'do something' file". Iterates over all lines of
+        all input files and calls the subroutine provided as the first
+        argument.
+
+        Example:
+
+            # Print all lines containing 'foobar'
+                plough(sub { print if /foobar/ }, "test.dat");
+
+        Works with one or more file names.
+
     "my $data = slurp($file)"
         Slurps in the file and returns a scalar with the file's content.
 
     "blurt($data, $file, $append)"
-        Opens a new file, prints the data in $data to it and closes the
-        file. If $append is set to a true value, data will be appended to
+        Opens a new file, prints the data in "$data" to it and closes the
+        file. If "$append" is set to a true value, data will be appended to
         the file. Default is false, existing files will be overwritten.
 
     "($stdout, $stderr) = tap($cmd)"
-        Rund a command $cmd in the shell, capture STDOUT and STDERR, and
+        Rund a command "$cmd" in the shell, capture STDOUT and STDERR, and
         return them as strings.
 
 AUTHOR

@@ -710,7 +710,9 @@ sub perm_cp {
 
 =item C<sysrun($cmd)>
 
-Run a shell command via C<system()> and die() if it fails.
+Run a shell command via C<system()> and die() if it fails. Also 
+works with a list of arguments, which are then interpreted as program
+name plus arguments, just like C<system()> does it.
 
 =cut
 

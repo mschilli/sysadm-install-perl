@@ -11,15 +11,16 @@ use File::Path;
 use Log::Log4perl qw(:easy);
 use LWP::Simple;
 use File::Basename;
+use Archive::Tar;
 use Cwd;
 
 require Exporter;
 our @ISA = qw(Exporter);
-our @EXPORT = qw(cp rmf mkd cd make cdback download);
+our @EXPORT = qw(cp rmf mkd cd make cdback download untar);
 
 our $VERSION = '0.01';
 
-our $OLD_DIR;
+our @DIR_STACK;
 
 =pod
 
@@ -67,7 +68,7 @@ Copy a file from C<$source> to C<$target>. C<target> can be a directory.
 ###############################################
 sub cp {
 ###############################################
-    DEBUG "Copying $_[0] to $_[1]";
+    INFO "cp $_[0] $_[1]";
     File::Copy::copy @_ or LOGDIE "Cannot copy $_[0] to $_[1] ($!)";
 }
 
@@ -83,7 +84,7 @@ name returned by C<basename($url)>.
 ###############################################
 sub download {
 ###############################################
-    DEBUG "Downloading $_[0] => ", basename($_[0]);
+    INFO "Downloading $_[0] => ", basename($_[0]);
     getstore($_[0], basename($_[0])) or LOGDIE "Cannot download $_[0] ($!)";
 }
 
@@ -94,7 +95,7 @@ sub download {
 Untar the tarball in C<$tgz_file>, which typically adheres to the
 C<someproject-X.XX.tgz> convention. But regardless of whether the 
 archive actually contains a top directory C<someproject-X.XX>,
-this function will behave if it had one. If it doesn't have one
+this function will behave if it had one. If it doesn't have one,
 a new directory is created before the unpacking takes place.
 
 =cut
@@ -102,7 +103,37 @@ a new directory is created before the unpacking takes place.
 ###############################################
 sub untar {
 ###############################################
-    DEBUG "Untarring $_[0]";
+    die "untar called without defined tarfile" unless @_ == 1 
+         and defined $_[0];
+
+    INFO "untar $_[0]";
+
+    my($nice, $topdir, $namedir) = archive_sniff($_[0]);
+
+    my $arch = Archive::Tar->new($_[0]);
+
+    if($nice and $topdir eq $namedir) {
+        DEBUG "Nice archive, extracting to subdir $topdir";
+        rmf($namedir);
+        $arch->extract();
+    } elsif($nice) {
+        DEBUG "Not-so-nice archive topdir=$topdir namedir=$namedir";
+        rmf($namedir);
+        rmf($topdir);
+            # extract as topdir
+        $arch->extract();
+        rename $topdir, $namedir or die "Can't rename $topdir, $namedir";
+    } else {
+        die "no topdir" unless defined $topdir;
+        DEBUG "Not-so-nice archive (no topdir), extracting to subdir $topdir";
+        rmf($topdir);
+        mkd($topdir);
+        cd($topdir);
+        $arch->extract();
+        cdback();
+    }
+
+    return $topdir;
 }
 
 =pod
@@ -116,7 +147,7 @@ Create a directory of arbitrary depth, just like C<File::Path::mkpath>.
 ###############################################
 sub mkd {
 ###############################################
-    DEBUG "Mkdir @_";
+    INFO "mkd @_";
     mkpath @_ or LOGDIE "Cannot mkdir @_ ($!)";
 }
 
@@ -132,7 +163,7 @@ in the shell.
 ###############################################
 sub rmf {
 ###############################################
-    DEBUG "rm -rf $_[0]";
+    INFO "rmf $_[0]";
     if(!-e $_[0]) {
         DEBUG "$_[0] doesn't exist - ignored";
         return;
@@ -151,11 +182,9 @@ chdir to the given directory.
 ###############################################
 sub cd {
 ###############################################
-    DEBUG "cd $_[0]";
-    $OLD_DIR = getcwd();
-    #DEBUG "old_dir=$OLD_DIR";
+    INFO "cd $_[0]";
+    push @DIR_STACK, getcwd();
     chdir($_[0]) or LOGDIE("Cannot cd $_[0] ($!)");
-    #DEBUG "new_dir=", getcwd();
 }
 
 =pod
@@ -169,8 +198,11 @@ chdir back to the last directory before a previous C<cd>.
 ###############################################
 sub cdback {
 ###############################################
-    DEBUG "cdback to $OLD_DIR";
-    cd($OLD_DIR);
+    die "cd stack empty" unless @DIR_STACK;
+
+    my $old_dir = pop @DIR_STACK;
+    INFO "cdback to $old_dir";
+    cd($old_dir);
 }
 
 =pod
@@ -184,13 +216,56 @@ Call C<make> in the shell.
 ###############################################
 sub make {
 ###############################################
-    DEBUG "make @_";
+    INFO "make @_";
     system("make @_") and LOGDIE "Cannot make @_ ($!)";
 }
 
 =pod
 
 =back
+
+=cut
+
+#######################################
+sub archive_sniff {
+#######################################
+    my($name) = @_;
+
+    DEBUG "Sniffing archive '$name'";
+
+    my ($dir) = ($name =~ /(.*?)\.(tar\.gz|tgz)$/);
+ 
+    return 0 unless defined $dir;
+
+    DEBUG "dir=$dir";
+
+    my $topdir;
+
+    my $tar = Archive::Tar->new($name);
+
+    my @names = $tar->list_files(["name"]);
+
+    die "Archive $name is empty" unless @names;
+
+    (my $archdir = $names[0]) =~ s#/.*##;
+
+    DEBUG "archdir=$archdir";
+
+    for my $name (@names) {
+        next if $name eq "./";
+        $name =~ s#^\./##;
+        ($topdir = $name) =~ s#/.*##;
+        if($topdir ne $archdir) {
+            return (0, $dir, $dir);
+        }
+    }
+
+    DEBUG "Return $topdir $dir";
+
+    return (1, $topdir, $dir);
+}
+
+=pod
 
 =head1 AUTHOR
 

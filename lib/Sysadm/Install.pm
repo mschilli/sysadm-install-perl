@@ -18,7 +18,7 @@ require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT = qw(cp rmf mkd cd make cdback download untar pie slurp blurt);
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 our @DIR_STACK;
 
@@ -317,7 +317,7 @@ sub pie {
 
 =pod
 
-=item C<slurp($file)>
+=item C<my $data = slurp($file)>
 
 Slurps in the file and returns a scalar with the file's content.
 

@@ -268,7 +268,7 @@ sub pick {
     my %files;
 
     if(@_ != 3 or ref($options) ne "ARRAY") {
-        die "Pick::list called with wrong #/type of args";
+        die "pick called with wrong #/type of args";
     }
     
     {

@@ -2,6 +2,9 @@
 Revision history for Sysadm::Install
 ########################################
 
+0.15 (not yet released)
+    (ms) Added eg/one-liner
+
 0.14 (03/10/2005)
     (ms) Added dry-run function dry_run(1) suppressing write actions
     (ms) Added perm_get and perm_set to compliment perm_cp

@@ -1,0 +1,6 @@
+#!/usr/bin/perl
+
+use Sysadm::Install qw(:all);
+my $in = join "", <>;
+$in =~ s/\n/ /g;
+print "perl -e ", qquote($in), "\n";

@@ -574,7 +574,7 @@ sub blurt {
 
 =item C<($stdout, $stderr) = tap($cmd)>
 
-Rund a command C<$cmd> in the shell, capture STDOUT and STDERR, and
+Run a command C<$cmd> in the shell, capture STDOUT and STDERR, and
 return them as strings.
 
 =cut
@@ -639,7 +639,7 @@ optional argument, consisting of a string listing  all escapable characters:
     => 1212 rocks!
 
 And there's a shortcut for shells: By specifying ':shell' as the
-metacharacters string, qquote() will actually use '!$[]()+?'.
+metacharacters string, qquote() will actually use '!$`'.
 
 For example, if you wanted to run the perl code
 
@@ -676,7 +676,7 @@ sub qquote {
     $str =~ s/([\\"])/\\$1/g;
 
     if(defined $metas) {
-        $metas = '!$[]()+?' if $metas eq ":shell";
+        $metas = '!$`' if $metas eq ":shell";
         $metas =~ s/\]/\\]/g;
         $str =~ s/([$metas])/\\$1/g;
     }
@@ -741,14 +741,12 @@ sub hammer {
     my(@cmds) = @_;
 
     my $exp = Expect->new();
-    $exp->raw_pty(1);
+    $exp->raw_pty(0);
 
     INFO "spawning: @cmds";
     $exp->spawn(@cmds);
 
-    $exp->send_slow(0, "\n") for 1..99;
-
-        # Wait until program finishes
+    $exp->send_slow(0.1, "\n") for 1..199;
     $exp->expect(undef);
 }
 

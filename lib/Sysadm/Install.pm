@@ -562,7 +562,8 @@ sub blurt {
 ###############################################
     my($data, $file, $append) = @_;
 
-    INFO(($append ? "appending" : "writing") . " data to $file");
+    INFO(($append ? "appending" : "writing") . " " .
+         length($data) . " bytes to $file");
 
     open FILE, ">" . ($append ? ">" : "") . $file 
         or LOGDIE "Cannot open $file for writing ($!)";

@@ -152,6 +152,9 @@ DESCRIPTION
 
             => 1212 rocks!
 
+        And there's a shortcut for shells: By specifying ':shell' as the
+        metacharacters string, qquote() will actually use '!$[]()+?'.
+
 AUTHOR
     Mike Schilli, <m@perlmeister.com>
 

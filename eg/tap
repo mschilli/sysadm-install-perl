@@ -1,0 +1,16 @@
+#!/usr/bin/perl
+###########################################
+# taptest
+# Mike Schilli, 2004 (m@perlmeister.com)
+###########################################
+use warnings;
+use strict;
+
+use Sysadm::Install qw(:all);
+use Log::Log4perl qw(:easy);
+Log::Log4perl->easy_init($DEBUG);
+
+my($stdout, $stderr) = tap("ls");
+
+print "stdout=[$stdout]\n";
+print "stderr=[$stderr]\n";

@@ -2,8 +2,12 @@
 Revision history for Sysadm::Install
 ########################################
 
-0.04 (10/15/2004)
+0.05 (10/16/2004)
     (ms) added mv
+    (ms) Functions not exported by default anymore. Use
+             use Sysadm::Install qw(:all)
+         to get the old behaviour.
+    (ms) added tap
 
 0.04 (10/08/2004)
     (ms) Fixed untar and test suite

@@ -1,10 +1,11 @@
 Changes
+eg/tap
+lib/Sysadm/Install.pm
+Makefile.PL
 MANIFEST
 MANIFEST.SKIP
 META.yml			Module meta-data (added by MakeMaker)
-Makefile.PL
 README
-lib/Sysadm/Install.pm
 t/001.t
 t/002tar.t
 t/003slurp.t

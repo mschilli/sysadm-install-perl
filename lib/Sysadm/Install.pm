@@ -6,6 +6,8 @@ use 5.006;
 use strict;
 use warnings;
 
+our $VERSION = '0.05';
+
 use File::Copy;
 use File::Path;
 use Log::Log4perl qw(:easy);
@@ -13,16 +15,40 @@ use LWP::Simple;
 use File::Basename;
 use Archive::Tar;
 use Cwd;
+use File::Temp;
 
-require Exporter;
-our @ISA = qw(Exporter);
-our @EXPORT = qw(cp rmf mkd cd make cdback download untar pie slurp blurt
-                 mv 
-                );
+our @EXPORTABLE = qw(
+cp rmf mkd cd make 
+cdback download untar 
+pie slurp blurt mv tap
+);
 
-our $VERSION = '0.05';
+our %EXPORTABLE = map { $_ => 1 } @EXPORTABLE;
 
 our @DIR_STACK;
+
+##################################################
+sub import {
+##################################################
+    my($class) = shift;
+
+    no strict qw(refs);
+
+    my $caller_pkg = caller();
+
+    my(%tags) = map { $_ => 1 } @_;
+
+        # Export all
+    if(exists $tags{':all'}) {
+        %tags = map { $_ => 1 } @EXPORTABLE;
+    }
+
+    for my $func (keys %tags) {
+        die __PACKAGE__ . 
+            "doesn't export \"$func\"" unless exists $EXPORTABLE{$func};
+        *{"$caller_pkg\::$func"} = *{$func};
+    }
+}
 
 =pod
 
@@ -32,7 +58,7 @@ Sysadm::Install - Typical installation tasks for system administrators
 
 =head1 SYNOPSIS
 
-  use Sysadm::Install;
+  use Sysadm::Install qw(:all);
 
   my $INST_DIR = '/home/me/install/';
 
@@ -51,6 +77,9 @@ Sysadm::Install - Typical installation tasks for system administrators
   pie(sub { s/Today/scalar localtime()/ge; $_; }, "build.dat");
 
   make("test install");
+
+     # run a cmd and tap into stdout and stderr
+  my($stdout, $stderr) = tap("ls -R");
 
 =head1 DESCRIPTION
 
@@ -379,6 +408,37 @@ sub blurt {
         or LOGDIE "Cannot open $file for writing ($!)";
     print FILE $data;
     close FILE;
+}
+
+=pod
+
+=item C<($stdout, $stderr) = tap($cmd)>
+
+Rund a command C<$cmd> in the shell, capture STDOUT and STDERR, and
+return them as strings.
+
+=cut
+
+###############################################
+sub tap {
+###############################################
+    my($cmd) = @_;
+
+    my $tmpfh   = File::Temp->new(UNLINK => 1, SUFFIX => '.dat');
+    my $tmpfile = $tmpfh->filename();
+
+    DEBUG "tempfile $tmpfile created";
+
+    $cmd = "$cmd 2>$tmpfile |";
+    INFO "tap $cmd";
+
+    open PIPE, $cmd or LOGDIE "open $cmd | failed ($!)";
+    my $stdout = join '', <PIPE>;
+    close PIPE or LOGDIE "close $cmd failed ($!)";
+
+    my $stderr = slurp($tmpfile);
+
+    return ($stdout, $stderr);
 }
 
 =pod

@@ -6,7 +6,7 @@ NAME
     Sysadm::Install - Typical installation tasks for system administrators
 
 SYNOPSIS
-      use Sysadm::Install;
+      use Sysadm::Install qw(:all);
 
       my $INST_DIR = '/home/me/install/';
 
@@ -25,6 +25,9 @@ SYNOPSIS
       pie(sub { s/Today/scalar localtime()/ge; $_; }, "build.dat");
 
       make("test install");
+
+         # run a cmd and tap into stdout and stderr
+      my($stdout, $stderr) = tap("ls -R");
 
 DESCRIPTION
     Have you ever wished for your installation shell scripts to run
@@ -94,6 +97,10 @@ DESCRIPTION
         Opens a new file, prints the data in $data to it and closes the
         file. If $append is set to a true value, data will be appended to
         the file. Default is false, existing files will be overwritten.
+
+    "($stdout, $stderr) = tap($cmd)"
+        Rund a command $cmd in the shell, capture STDOUT and STDERR, and
+        return them as strings.
 
 AUTHOR
     Mike Schilli, <m@perlmeister.com>

@@ -39,6 +39,11 @@ DESCRIPTION
     It has a "fail once and die" policy, meticulously checking the result of
     every operation and calling "die()" immeditatly if anything fails.
 
+    "Sysadm::Install" also supports a *dry_run* mode, in which it logs
+    everything, but suppresses any write actions. Dry run mode is enabled by
+    calling Sysadm::Install::dry_run(1). To switch back to normal, call
+    Sysadm::Install::dry_run(0).
+
   FUNCTIONS
     "cp($source, $target)"
         Copy a file from $source to $target. "target" can be a directory.
@@ -309,7 +314,7 @@ AUTHOR
     Mike Schilli, <m@perlmeister.com>
 
 COPYRIGHT AND LICENSE
-    Copyright (C) 2004, 2005 by Mike Schilli
+    Copyright (C) 2004 by Mike Schilli
 
     This library is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself, either Perl version 5.8.3 or, at

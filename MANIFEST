@@ -1,6 +1,7 @@
 Changes
 eg/ask
 eg/mkperl
+eg/perm_cp
 eg/tap
 eg/untar_in
 lib/Sysadm/Install.pm
@@ -16,5 +17,6 @@ t/004plough.t
 t/005qquote.t
 t/006perm.t
 t/007fs.t
+t/008dry.t
 t/canned/test.tar
 t/canned/testa.tar

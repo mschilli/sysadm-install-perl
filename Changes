@@ -2,7 +2,10 @@
 Revision history for Sysadm::Install
 ########################################
 
+TODO: * fix tap(@cmds)
+
 0.10 (not yet released)
+    (ms) removed Expect dependency ('require' on demand)
     (ms) added say()
     (ms) added sudo_me() and bin_find()
 

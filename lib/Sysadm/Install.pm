@@ -20,7 +20,7 @@ our @EXPORT = qw(cp rmf mkd cd make cdback download untar pie slurp blurt
                  mv 
                 );
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 our @DIR_STACK;
 

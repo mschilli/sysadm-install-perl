@@ -1,0 +1,70 @@
+######################################################################
+    Sysadm::Install 0.01
+######################################################################
+
+NAME
+    Sysadm::Install - Typical installation tasks for system administrators
+
+SYNOPSIS
+      use Sysadm::Install;
+
+      my $INST_DIR = '/home/me/install/';
+
+      cd($INST_DIR);
+      cp("/deliver/someproj.tgz", ".");
+      untar("someproj.tgz");
+      cd("someproj");
+      make("test install");
+
+DESCRIPTION
+    Have you ever wished for your installation shell scripts to run
+    reproducably, without much programming fuzz, and even with optional
+    logging enabled? Then give shell programming, use Perl.
+
+    "Sysadm::Install" executes shell-like commands performing typical
+    installation tasks: Copying files, extracting tarballs, calling "make".
+    It has a "fail once and die" policy, meticulously checking the result of
+    ever operation and calling "die()" immeditatly if anything fails.
+
+  FUNCTIONS
+    "cp($source, $target)"
+        Copy a file from $source to $target. "target" can be a directory.
+
+    "download($url)"
+        Download a file specified by $url and store it under the name
+        returned by "basename($url)".
+
+    "untar($tgz_file)"
+        Untar the tarball in $tgz_file, which typically adheres to the
+        "someproject-X.XX.tgz" convention. But regardless of whether the
+        archive actually contains a top directory "someproject-X.XX", this
+        function will behave if it had one. If it doesn't have one a new
+        directory is created before the unpacking takes place.
+
+    "mkd($dir)"
+        Create a directory of arbitrary depth, just like
+        "File::Path::mkpath".
+
+    "rmf($dir)"
+        Delete a directory and all of its descendents, just like "rm -rf" in
+        the shell.
+
+    "cd($dir)"
+        chdir to the given directory.
+
+    "cdback()"
+        chdir back to the last directory before a previous "cd".
+
+    "make()"
+        Call "make" in the shell.
+
+AUTHOR
+    Mike Schilli, <m@perlmeister.com>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2004 by Mike Schilli
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.3 or, at
+    your option, any later version of Perl 5 you may have available.
+

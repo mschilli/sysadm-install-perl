@@ -17,6 +17,7 @@ use File::Spec::Functions qw(rel2abs abs2rel);
 use Archive::Tar;
 use Cwd;
 use File::Temp;
+use Expect;
 
 our @EXPORTABLE = qw(
 cp rmf mkd cd make 
@@ -24,6 +25,7 @@ cdback download untar
 pie slurp blurt mv tap 
 plough qquote perm_cp
 sysrun untar_in pick ask
+hammer
 );
 
 our %EXPORTABLE = map { $_ => 1 } @EXPORTABLE;
@@ -280,9 +282,9 @@ sub pick {
     
         print STDERR "$prompt [$default_int]> ";
         my $input = <STDIN>;
-        chomp($input);
+        chomp($input) if defined $input;
 
-        $input = $default_int unless length($input);
+        $input = $default_int if !defined $input or !length($input);
 
         redo if $input !~ /^\d+$/ or 
                 $input == 0 or 
@@ -722,6 +724,32 @@ sub sysrun {
     INFO "sysrun: @cmds";
 
     system(@cmds) and LOGDIE "@cmds failed ($!)";
+}
+
+=pod
+
+=item C<hammer($cmd, $arg, ...)>
+
+Run a command in the shell and simulate a user hammering the
+ENTER key to accept defaults on prompts.
+
+=cut
+
+######################################
+sub hammer {
+######################################
+    my(@cmds) = @_;
+
+    my $exp = Expect->new();
+    $exp->raw_pty(1);
+
+    INFO "spawning: @cmds";
+    $exp->spawn(@cmds);
+
+    $exp->send_slow(0, "\n") for 1..999;
+
+        # Wait until program finishes
+    $exp->expect(undef);
 }
 
 =pod

@@ -13,6 +13,7 @@ use File::Path;
 use Log::Log4perl qw(:easy);
 use LWP::Simple;
 use File::Basename;
+use File::Spec::Functions qw(rel2abs abs2rel);
 use Archive::Tar;
 use Cwd;
 use File::Temp;
@@ -22,6 +23,7 @@ cp rmf mkd cd make
 cdback download untar 
 pie slurp blurt mv tap 
 plough qquote perm_cp
+sysrun untar_in pick ask
 );
 
 our %EXPORTABLE = map { $_ => 1 } @EXPORTABLE;
@@ -197,6 +199,123 @@ sub untar {
     }
 
     return $topdir;
+}
+
+=pod
+
+=item C<untar_in($tar_file, $dir)>
+
+Untar the tarball in C<$tgz_file> in directory C<$dir>. Create
+C<$dir> if it doesn't exist yet.
+
+=cut
+
+###############################################
+sub untar_in {
+###############################################
+    my($tar_file, $dir) = @_;
+
+    LOGDIE "not enough arguments" if
+      ! defined $tar_file or ! defined $dir;
+
+    mkd($dir) unless -d $dir;
+
+    my $tar_file_abs = rel2abs($tar_file, dirname($tar_file));
+
+    cd($dir);
+    INFO "Untarring $tar_file_abs in $dir";
+    my $arch = Archive::Tar->new("$tar_file_abs");
+    $arch->extract() or LOGDIE "Extract failed: $!";
+    cdback();
+}
+
+=pod
+
+=item C<pick($prompt, $options, $default)>
+
+Ask the user to pick an item from a displayed list. C<$prompt>
+is the text displayed, C<$options> is a referenc to an array of
+choices, and C<$default> is the number (starting from 1, not 0)
+of the default item. For example,
+
+    pick("Pick a fruit", ["apple", "pear", "pineapple"], 3);
+
+will display the following:
+
+    [1] apple
+    [2] pear
+    [3] pineapple
+    Pick a fruit [3]>
+
+If the user just hits I<Enter>, "pineapple" (the default value) will
+be returned. Note that 3 marks the 3rd element of the list, and is
+I<not> an index value into the array.
+
+If the user enters C<1>, C<2> or C<3>, the corresponding text string
+(C<"apple">, C<"pear">, C<"pineapple"> will be returned by
+C<pick()>.
+
+=cut
+
+##################################################
+sub pick {
+##################################################
+    my ($prompt, $options, $default) = @_;    
+
+    my $default_int;
+    my %files;
+
+    if(@_ != 3 or ref($options) ne "ARRAY") {
+        die "Pick::list called with wrong #/type of args";
+    }
+    
+    {
+        my $count = 0;
+
+        foreach (@$options) {
+            print STDERR "[", ++$count, "] $_\n";
+            $default_int = $count if $count eq $default;
+            $files{$count} = $_;
+        }
+    
+        print STDERR "$prompt [$default_int]> ";
+        my $input = <STDIN>;
+        chomp($input);
+
+        $input = $default_int unless length($input);
+
+        redo if $input !~ /^\d+$/ or 
+                $input == 0 or 
+                $input > scalar @$options;
+        return "$files{$input}";
+    }
+}
+
+=pod
+
+=item C<ask($prompt, $default)>
+
+Ask the user to either hit I<Enter> and select the displayed default
+or to type in another string.
+
+=cut
+
+##################################################
+sub ask {
+##################################################
+    my ($prompt, $default) = @_;    
+
+    if(@_ != 2) {
+        die "ask() called with wrong # of args";
+    }
+
+    print STDERR "$prompt [$default]> ";
+    my $value = <STDIN>;
+    chomp $value;
+
+    $value = $default if $value eq "";
+
+    return $value;
 }
 
 =pod
@@ -583,6 +702,26 @@ sub perm_cp {
     my @perms = (stat shift)[2,4,5];
     chown @perms[1,2],          @_;
     chmod $perms[0] & 07777,    @_;
+}
+
+=pod
+
+=item C<sysrun($cmd)>
+
+Run a shell command via C<system()> and die() if it fails.
+
+=cut
+
+######################################
+sub sysrun {
+######################################
+    my(@cmds) = @_;
+
+    LOGDIE("usage: sysrun cmd ...") if @_ < 1;
+
+    INFO "sysrun: @cmds";
+
+    system(@cmds) and LOGDIE "@cmds failed ($!)";
 }
 
 =pod

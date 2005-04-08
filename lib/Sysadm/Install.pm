@@ -11,6 +11,7 @@ our $VERSION = '0.15';
 use File::Copy;
 use File::Path;
 use Log::Log4perl qw(:easy);
+use Log::Log4perl::Util;
 use LWP::Simple;
 use File::Basename;
 use File::Spec::Functions qw(rel2abs abs2rel);
@@ -182,15 +183,19 @@ sub download {
 
 =pod
 
-=item C<untar($tgz_file)>
+=item C<untar($tarball)>
 
-Untar the tarball in C<$tgz_file>, which typically adheres to the
-C<someproject-X.XX.tgz> convention. But regardless of whether the 
+Untar the tarball in C<$tarball>, which typically adheres to the
+C<someproject-X.XX.tgz> convention. 
+But regardless of whether the 
 archive actually contains a top directory C<someproject-X.XX>,
 this function will behave if it had one. If it doesn't have one,
 a new directory is created before the unpacking takes place. Unpacks
 the tarball into the current directory, no matter where the tarfile
-is located.
+is located. 
+Please note that if you're
+using a compressed tarball (.tar.gz or .tgz), you'll need
+IO::Zlib installed. 
 
 =cut
 
@@ -205,6 +210,7 @@ sub untar {
 
     my($nice, $topdir, $namedir) = archive_sniff($_[0]);
 
+    check_zlib($_[0]);
     my $arch = Archive::Tar->new($_[0]);
 
     if($nice and $topdir eq $namedir) {
@@ -257,6 +263,8 @@ sub untar_in {
     my $tar_file_abs = rel2abs($tar_file, dirname($tar_file));
 
     cd($dir);
+
+    check_zlib($tar_file_abs);
     my $arch = Archive::Tar->new("$tar_file_abs");
     $arch->extract() or LOGDIE "Extract failed: $!";
     cdback();
@@ -445,6 +453,19 @@ sub make {
 
 =cut
 
+###############################################
+sub check_zlib {
+###############################################
+    my($tar_file) = @_;
+
+    if($tar_file =~ /\.tar\.gz\b|\.tgz\b/ and
+       !Log::Log4perl::Util::module_available("IO::Zlib")) {
+
+        LOGDIE "$tar_file: Compressed tarballs can only be processed",
+               " with IO::Zlib installed.";
+    }
+}
+     
 #######################################
 sub archive_sniff {
 #######################################
@@ -460,6 +481,8 @@ sub archive_sniff {
     DEBUG "dir=$dir";
 
     my $topdir;
+
+    check_zlib($name);
 
     my $tar = Archive::Tar->new($name);
 

@@ -2,6 +2,10 @@
 Revision history for Sysadm::Install
 ########################################
 
+0.16 (2005/04/07)
+    (ms) Added check for IO::Zlib and better error message if it's
+         not installed and a compressed tarball needs to be processed.
+
 0.15 (03/17/2005)
     (ms) Added eg/one-liner
 

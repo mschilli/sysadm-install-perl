@@ -10,6 +10,8 @@ Revision history for Sysadm::Install
          read/written.
     (ms) Added check for IO::Zlib and better error message if it's
          not installed and a compressed tarball needs to be processed.
+    (ms) Requiring L4p 0.48 and Archive::Tar 1.23 to make sure test
+         suite succeeds.
 
 0.15 (03/17/2005)
     (ms) Added eg/one-liner

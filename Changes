@@ -2,11 +2,14 @@
 Revision history for Sysadm::Install
 ########################################
 
-0.16 (2005/04/07)
+0.16 2005/04/10
+    (ms) Bumped up Log4perl reporting level. On typical S:I functions,
+         the log message will show the *calling program*'s file name
+         and line number.
+    (ms) slurp() and blurp() are now displaying parts of the data 
+         read/written.
     (ms) Added check for IO::Zlib and better error message if it's
          not installed and a compressed tarball needs to be processed.
-    (ms) TODO: Carp instead of LOGDIE in slurp/blurt...
-    (ms) TODO: Display some content of slurp/blurt data.
 
 0.15 (03/17/2005)
     (ms) Added eg/one-liner

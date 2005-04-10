@@ -21,6 +21,7 @@ use File::Temp;
 
 our $DRY_RUN;
 our $DRY_RUN_MSG;
+our $DATA_SNIPPED_LEN = 60;
 
 dry_run(0);
 
@@ -47,6 +48,7 @@ sysrun untar_in pick ask
 hammer say
 sudo_me bin_find
 fs_read_open fs_write_open pipe_copy
+snip
 );
 
 our %EXPORTABLE = map { $_ => 1 } @EXPORTABLE;
@@ -70,7 +72,7 @@ sub import {
     }
 
     for my $func (keys %tags) {
-        die __PACKAGE__ . 
+        LOGDIE __PACKAGE__ . 
             "doesn't export \"$func\"" unless exists $EXPORTABLE{$func};
         *{"$caller_pkg\::$func"} = *{$func};
     }
@@ -123,6 +125,11 @@ logs everything, but suppresses any write actions. Dry run mode
 is enabled by calling C<Sysadm::Install::dry_run(1)>. To switch
 back to normal, call C<Sysadm::Install::dry_run(0)>.
 
+C<Sysadm::Install> is fully Log4perl-enabled. To start logging, just
+initialize C<Log::Log4perl>. C<Sysadm::Install> acts as a wrapper class,
+meaning that file names and line numbers are reported from the calling
+program's point of view.
+
 =head2 FUNCTIONS
 
 =over 4
@@ -143,6 +150,8 @@ shown below.
 ###############################################
 sub cp {
 ###############################################
+
+    local($Log::Log4perl::caller_depth) += 1;
     INFO "cp $_[0] $_[1] $DRY_RUN_MSG";
     return 1 if $DRY_RUN;
     File::Copy::copy @_ or LOGDIE "Cannot copy $_[0] to $_[1] ($!)";
@@ -159,6 +168,8 @@ Move a file from C<$source> to C<$target>. C<target> can be a directory.
 ###############################################
 sub mv {
 ###############################################
+
+    local($Log::Log4perl::caller_depth) += 1;
     INFO "mv $_[0] $_[1] $DRY_RUN_MSG";
     return 1 if $DRY_RUN;
     File::Copy::move @_ or LOGDIE "Cannot move $_[0] to $_[1] ($!)";
@@ -176,6 +187,8 @@ name returned by C<basename($url)>.
 ###############################################
 sub download {
 ###############################################
+
+    local($Log::Log4perl::caller_depth) += 1;
     INFO "Downloading $_[0] => ", basename($_[0]), " $DRY_RUN_MSG";
     return 1 if $DRY_RUN;
     getstore($_[0], basename($_[0])) or LOGDIE "Cannot download $_[0] ($!)";
@@ -202,8 +215,10 @@ IO::Zlib installed.
 ###############################################
 sub untar {
 ###############################################
-    die "untar called without defined tarfile" unless @_ == 1 
-         and defined $_[0];
+    local($Log::Log4perl::caller_depth) += 1;
+
+    LOGDIE "untar called without defined tarfile" unless 
+         @_ == 1 and defined $_[0];
 
     INFO "untar $_[0] $DRY_RUN_MSG";
     return 1 if $DRY_RUN;
@@ -223,9 +238,10 @@ sub untar {
         rmf($topdir);
             # extract as topdir
         $arch->extract();
-        rename $topdir, $namedir or die "Can't rename $topdir, $namedir";
+        rename $topdir, $namedir or 
+            LOGDIE "Can't rename $topdir, $namedir";
     } else {
-        die "no topdir" unless defined $topdir;
+        LOGDIE "no topdir" unless defined $topdir;
         DEBUG "Not-so-nice archive (no topdir), extracting to subdir $topdir";
         $topdir = basename $topdir;
         rmf($topdir);
@@ -251,6 +267,8 @@ C<$dir> if it doesn't exist yet.
 sub untar_in {
 ###############################################
     my($tar_file, $dir) = @_;
+
+    local($Log::Log4perl::caller_depth) += 1;
 
     LOGDIE "not enough arguments" if
       ! defined $tar_file or ! defined $dir;
@@ -303,11 +321,13 @@ sub pick {
 ##################################################
     my ($prompt, $options, $default) = @_;    
 
+    local($Log::Log4perl::caller_depth) += 1;
+
     my $default_int;
     my %files;
 
     if(@_ != 3 or ref($options) ne "ARRAY") {
-        die "pick called with wrong #/type of args";
+        LOGDIE "pick called with wrong #/type of args";
     }
     
     {
@@ -346,8 +366,10 @@ sub ask {
 ##################################################
     my ($prompt, $default) = @_;    
 
+    local($Log::Log4perl::caller_depth) += 1;
+
     if(@_ != 2) {
-        die "ask() called with wrong # of args";
+        LOGDIE "ask() called with wrong # of args";
     }
 
     print STDERR "$prompt [$default]> ";
@@ -370,6 +392,8 @@ Create a directory of arbitrary depth, just like C<File::Path::mkpath>.
 ###############################################
 sub mkd {
 ###############################################
+
+    local($Log::Log4perl::caller_depth) += 1;
     INFO "mkd @_ $DRY_RUN_MSG";
     return 1 if $DRY_RUN;
     mkpath @_ or LOGDIE "Cannot mkdir @_ ($!)";
@@ -387,6 +411,8 @@ in the shell.
 ###############################################
 sub rmf {
 ###############################################
+
+    local($Log::Log4perl::caller_depth) += 1;
     INFO "rmf $_[0] $DRY_RUN_MSG";
     return 1 if $DRY_RUN;
 
@@ -408,6 +434,8 @@ chdir to the given directory.
 ###############################################
 sub cd {
 ###############################################
+
+    local($Log::Log4perl::caller_depth) += 1;
     INFO "cd $_[0]";
 
     push @DIR_STACK, getcwd();
@@ -425,7 +453,10 @@ chdir back to the last directory before a previous C<cd>.
 ###############################################
 sub cdback {
 ###############################################
-    die "cd stack empty" unless @DIR_STACK;
+
+    local($Log::Log4perl::caller_depth) += 1;
+
+    LOGDIE "cd stack empty" unless @DIR_STACK;
 
     my $old_dir = pop @DIR_STACK;
     INFO "cdback to $old_dir";
@@ -443,6 +474,9 @@ Call C<make> in the shell.
 ###############################################
 sub make {
 ###############################################
+
+    local($Log::Log4perl::caller_depth) += 1;
+
     INFO "make @_ $DRY_RUN_MSG";
     return 1 if $DRY_RUN;
 
@@ -471,6 +505,8 @@ sub archive_sniff {
 #######################################
     my($name) = @_;
 
+    local($Log::Log4perl::caller_depth) += 1;
+
     DEBUG "Sniffing archive '$name'";
 
     my ($dir) = ($name =~ /(.*?)\.(tar\.gz|tgz|tar)$/);
@@ -488,7 +524,7 @@ sub archive_sniff {
 
     my @names = $tar->list_files(["name"]);
 
-    die "Archive $name is empty" unless @names;
+    LOGDIE "Archive $name is empty" unless @names;
 
     (my $archdir = $names[0]) =~ s#/.*##;
 
@@ -532,6 +568,8 @@ sub pie {
 ###############################################
     my($coderef, @files) = @_;
 
+    local($Log::Log4perl::caller_depth) += 1;
+
     for my $file (@files) {
 
         INFO "editing $file in-place $DRY_RUN_MSG";
@@ -570,6 +608,8 @@ sub plough {
 ###############################################
     my($coderef, @files) = @_;
 
+    local($Log::Log4perl::caller_depth) += 1;
+
     for my $file (@files) {
 
         INFO "Ploughing through $file $DRY_RUN_MSG";
@@ -598,7 +638,9 @@ sub slurp {
 ###############################################
     my($file) = @_;
 
-    INFO "slurping data from $file";
+    local($Log::Log4perl::caller_depth) += 1;
+
+    INFO "Slurping data from $file";
 
     local $/ = undef;
 
@@ -606,7 +648,7 @@ sub slurp {
     my $data = <FILE>;
     close FILE;
 
-    DEBUG "Read ", length($data), " bytes from $file";
+    DEBUG "Read ", snip($data, $DATA_SNIPPED_LEN), " from $file";
 
     return $data;
 }
@@ -626,7 +668,9 @@ sub blurt {
 ###############################################
     my($data, $file, $append) = @_;
 
-    INFO(($append ? "appending" : "writing") . " " .
+    local($Log::Log4perl::caller_depth) += 1;
+
+    INFO(($append ? "Appending" : "Writing") . " " .
          length($data) . " bytes to $file $DRY_RUN_MSG");
     return 1 if $DRY_RUN;
 
@@ -634,6 +678,8 @@ sub blurt {
         or LOGDIE "Cannot open $file for writing ($!)";
     print FILE $data;
     close FILE;
+
+    DEBUG "Wrote ", snip($data, $DATA_SNIPPED_LEN), " to $file";
 }
 
 =pod
@@ -683,6 +729,8 @@ wrapping all args so that shell variables are interpolated properly:
 sub tap {
 ###############################################
     my(@args) = @_;
+
+    local($Log::Log4perl::caller_depth) += 1;
 
     if($DRY_RUN) {
         INFO "tapping @args $DRY_RUN_MSG";
@@ -856,6 +904,8 @@ sub perm_cp {
     # Lifted from Ben Okopnik's
     # http://www.linuxgazette.com/issue87/misc/tips/cpmod.pl.txt
 
+    local($Log::Log4perl::caller_depth) += 1;
+
     INFO "perm_cp @_ $DRY_RUN_MSG";
     return 1 if $DRY_RUN;
 
@@ -880,6 +930,8 @@ sub perm_get {
 ######################################
     my($filename) = @_;
 
+    local($Log::Log4perl::caller_depth) += 1;
+
     my @stats = (stat $filename)[2,4,5] or
         LOGDIE "Cannot stat $filename ($!)";
 
@@ -902,6 +954,8 @@ acquired by calling C<perm_get($filename)>.
 sub perm_set {
 ######################################
     my($filename, $perms) = @_;
+
+    local($Log::Log4perl::caller_depth) += 1;
 
     INFO "perm_set $filename (@$perms) $DRY_RUN_MSG";
     return 1 if $DRY_RUN;
@@ -927,6 +981,8 @@ sub sysrun {
 ######################################
     my(@cmds) = @_;
 
+    local($Log::Log4perl::caller_depth) += 1;
+
     INFO "sysrun: @cmds $DRY_RUN_MSG";
     return 1 if $DRY_RUN;
 
@@ -950,6 +1006,8 @@ sub hammer {
     my(@cmds) = @_;
 
     require Expect;
+
+    local($Log::Log4perl::caller_depth) += 1;
 
     if($DRY_RUN) {
         INFO "Hammer: @cmds $DRY_RUN_MSG";
@@ -999,6 +1057,8 @@ C<getopts()> have kicked in.
 sub sudo_me {
 ######################################
     my($argv) = @_;
+
+    local($Log::Log4perl::caller_depth) += 1;
 
     if($DRY_RUN) {
         INFO "sudo_me $DRY_RUN_MSG";
@@ -1058,6 +1118,8 @@ sub fs_read_open {
 ######################################
     my($dir) = @_;
 
+    local($Log::Log4perl::caller_depth) += 1;
+
     my $find = bin_find("find");
     LOGDIE "Cannot find 'find'" unless defined $find;
 
@@ -1094,6 +1156,8 @@ sub fs_write_open {
 ######################################
     my($dir) = @_;
 
+    local($Log::Log4perl::caller_depth) += 1;
+
     my $cpio = bin_find("cpio");
     LOGDIE "Cannot find 'cpio'" unless defined $cpio;
 
@@ -1125,6 +1189,8 @@ sub pipe_copy {
 ######################################
     my($in, $out, $bufsize) = @_;
 
+    local($Log::Log4perl::caller_depth) += 1;
+
     $bufsize ||= 4096;
     my $bytes = 0;
 
@@ -1136,6 +1202,61 @@ sub pipe_copy {
     }
 
     INFO "Closed pipe (bufsize=$bufsize, transferred=$bytes)";
+}
+
+=pod
+
+=item C<snip($data, $maxlen)>
+
+Format the data string in C<$data> so that it's only (roughly) $maxlen
+characters long and only contains printable characters.
+
+If C<$data> contains unprintable character's they are replaced by 
+"." (the dot). If C<$data> is longer than C<$maxlen>, it will be
+formatted like
+
+    (22)[abcdef[snip=11]stuvw]
+
+indicating the length of the original string, the beginning, the
+end, and the number of 'snipped' characters.
+
+=cut
+
+###########################################
+sub snip {
+###########################################
+    my($data, $maxlen) = @_;
+
+    if(length $data <= $maxlen) {
+        return lenformat($data);
+    }
+
+    $maxlen = 12 if $maxlen < 12;
+    my $sniplen = int(($maxlen - 8) / 2);
+
+    my $start   = substr($data,  0, $sniplen);
+    my $end     = substr($data, -$sniplen);
+    my $snipped = length($data) - 2*$sniplen;
+
+    return lenformat("$start\[snip=$snipped]$end", length $data);
+}
+    
+###########################################
+sub lenformat {
+###########################################
+    my($data, $orglen) = @_;
+
+    return "(" . ($orglen || length($data)) . ")[" .
+        printable($data) . "]";
+}
+
+###########################################
+sub printable {
+###########################################
+    my($data) = @_;
+
+    $data =~ s/[^ \w.;!?@#$%^&*()+\\|~`'-,><[\]{}="]/./g;
+    return $data;
 }
 
 =pod

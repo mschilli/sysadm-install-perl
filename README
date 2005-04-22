@@ -1,5 +1,5 @@
 ######################################################################
-    Sysadm::Install 0.16
+    Sysadm::Install 0.17
 ######################################################################
 
 NAME
@@ -147,7 +147,9 @@ DESCRIPTION
         Works with one or more file names.
 
     "my $data = slurp($file)"
-        Slurps in the file and returns a scalar with the file's content.
+        Slurps in the file and returns a scalar with the file's content. If
+        called without argument, data is slurped from STDIN or from any
+        files provided on the command line (like <> operates).
 
     "blurt($data, $file, $append)"
         Opens a new file, prints the data in $data to it and closes the

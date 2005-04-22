@@ -2,7 +2,9 @@
 # Tests for Sysadm::Install/s slurp/blurt/pie
 #############################################
 
-use Test::More tests => 3;
+use Test::More tests => 4;
+use strict;
+use warnings;
 
 use Sysadm::Install qw(:all);
 
@@ -28,6 +30,13 @@ ok(-f $TMP_FILE, "$TMP_FILE exists");
 # Slurp
 #####################################################################
 my $data = slurp($TMP_FILE);
+is($data, "one\ntwo\nthree", "$TMP_FILE contains right data");
+
+#####################################################################
+# Slurp from @ARGS
+#####################################################################
+@ARGV = ($TMP_FILE);
+$data = slurp();
 is($data, "one\ntwo\nthree", "$TMP_FILE contains right data");
 
 #####################################################################

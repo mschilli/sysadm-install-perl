@@ -629,7 +629,9 @@ sub plough {
 
 =item C<my $data = slurp($file)>
 
-Slurps in the file and returns a scalar with the file's content.
+Slurps in the file and returns a scalar with the file's content. If
+called without argument, data is slurped from STDIN or from any files
+provided on the command line (like E<lt>E<gt> operates).
 
 =cut
 
@@ -640,15 +642,23 @@ sub slurp {
 
     local($Log::Log4perl::caller_depth) += 1;
 
-    INFO "Slurping data from $file";
+    my $from_file = defined($file);
 
     local $/ = undef;
 
-    open FILE, "<$file" or LOGDIE "Cannot open $file ($!)";
-    my $data = <FILE>;
-    close FILE;
+    my $data;
 
-    DEBUG "Read ", snip($data, $DATA_SNIPPED_LEN), " from $file";
+    if($from_file) {
+        INFO "Slurping data from $file";
+        open FILE, "<$file" or LOGDIE "Cannot open $file ($!)";
+        $data = <FILE>;
+        close FILE;
+        DEBUG "Read ", snip($data, $DATA_SNIPPED_LEN), " from $file";
+    } else {
+        INFO "Slurping data from <>";
+        $data = <>;
+        DEBUG "Read ", snip($data, $DATA_SNIPPED_LEN), " from <>";
+    }
 
     return $data;
 }

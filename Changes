@@ -2,6 +2,10 @@
 Revision history for Sysadm::Install
 ########################################
 
+0.17 2005/04/22
+    (ms) Added patch by Jud Dagnall to allow slurp() to process
+         @ARGS like <> does.
+
 0.16 2005/04/10
     (ms) Bumped up Log4perl reporting level. On typical S:I functions,
          the log message will show the *calling program*'s file name

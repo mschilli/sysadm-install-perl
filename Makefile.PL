@@ -15,6 +15,18 @@ WARNING: Expect not found.
 EOT
 }
 
+eval {
+    require Archive::Tar;
+};
+
+if($@) {
+    print <<EOT;
+WARNING: Archive::Tar not found.
+         You won't be able to use untar() or untar_in().
+         Install Archive::Tar from CPAN later if you want to.
+EOT
+}
+
 WriteMakefile(
     NAME              => 'Sysadm::Install',
     VERSION_FROM      => 'lib/Sysadm/Install.pm', # finds $VERSION
@@ -24,7 +36,6 @@ WriteMakefile(
         File::Copy      => 0,
         File::Path      => 0,
         File::Basename  => 0,
-        Archive::Tar    => 1.23,
         LWP::Simple     => 0,
         Cwd             => 0,
         File::Temp      => 0,

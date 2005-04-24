@@ -15,7 +15,6 @@ use Log::Log4perl::Util;
 use LWP::Simple;
 use File::Basename;
 use File::Spec::Functions qw(rel2abs abs2rel);
-use Archive::Tar;
 use Cwd;
 use File::Temp;
 
@@ -268,6 +267,7 @@ sub untar {
     my($nice, $topdir, $namedir) = archive_sniff($_[0]);
 
     check_zlib($_[0]);
+    require Archive::Tar;
     my $arch = Archive::Tar->new($_[0]);
 
     if($nice and $topdir eq $namedir) {
@@ -324,6 +324,7 @@ sub untar_in {
     cd($dir);
 
     check_zlib($tar_file_abs);
+    require Archive::Tar;
     my $arch = Archive::Tar->new("$tar_file_abs");
     $arch->extract() or LOGDIE "Extract failed: $!";
     cdback();
@@ -562,6 +563,7 @@ sub archive_sniff {
 
     check_zlib($name);
 
+    require Archive::Tar;
     my $tar = Archive::Tar->new($name);
 
     my @names = $tar->list_files(["name"]);

@@ -20,10 +20,12 @@ use Cwd;
 use File::Temp;
 
 our $DRY_RUN;
+our $CONFIRM;
 our $DRY_RUN_MSG;
 our $DATA_SNIPPED_LEN = 60;
 
 dry_run(0);
+confirm(0);
 
 ###############################################
 sub dry_run {
@@ -37,6 +39,38 @@ sub dry_run {
         $DRY_RUN     = 0;
         $DRY_RUN_MSG = "";
     }
+}
+
+###############################################
+sub confirm {
+###############################################
+    my($on) = @_;
+
+    $CONFIRM = $on;
+}
+
+###########################################
+sub _confirm {
+###########################################
+    my($msg) = @_;
+
+    if($DRY_RUN) {
+        INFO "$msg $DRY_RUN_MSG";
+        return 0 if $DRY_RUN;
+    }
+
+    if($CONFIRM) {
+        my $answer = ask("$msg ([y]/n)", "y");
+        if($answer =~ /^\s*y\s*$/) {
+            INFO $msg;
+            return 1;
+        }
+
+        INFO "$msg (*CANCELLED* as requested)";
+        return 0;
+    }
+
+    return 1;
 }
 
 our @EXPORTABLE = qw(
@@ -125,6 +159,12 @@ logs everything, but suppresses any write actions. Dry run mode
 is enabled by calling C<Sysadm::Install::dry_run(1)>. To switch
 back to normal, call C<Sysadm::Install::dry_run(0)>.
 
+As of version 0.17, C<Sysadm::Install> supports a I<confirm> mode,
+in which it interactively asks the user before running any of its
+functions (just like C<rm -i>). I<confirm> mode is enabled by calling 
+C<Sysadm::Install::confirm(1)>. To switch
+back to normal, call C<Sysadm::Install::confirm(0)>.
+
 C<Sysadm::Install> is fully Log4perl-enabled. To start logging, just
 initialize C<Log::Log4perl>. C<Sysadm::Install> acts as a wrapper class,
 meaning that file names and line numbers are reported from the calling
@@ -152,8 +192,9 @@ sub cp {
 ###############################################
 
     local($Log::Log4perl::caller_depth) += 1;
-    INFO "cp $_[0] $_[1] $DRY_RUN_MSG";
-    return 1 if $DRY_RUN;
+
+    _confirm("cp $_[0] $_[1]") or return 1;
+
     File::Copy::copy @_ or LOGDIE "Cannot copy $_[0] to $_[1] ($!)";
 }
 
@@ -170,8 +211,9 @@ sub mv {
 ###############################################
 
     local($Log::Log4perl::caller_depth) += 1;
-    INFO "mv $_[0] $_[1] $DRY_RUN_MSG";
-    return 1 if $DRY_RUN;
+
+    _confirm("mv $_[0] $_[1]") or return 1;
+
     File::Copy::move @_ or LOGDIE "Cannot move $_[0] to $_[1] ($!)";
 }
 
@@ -189,8 +231,9 @@ sub download {
 ###############################################
 
     local($Log::Log4perl::caller_depth) += 1;
-    INFO "Downloading $_[0] => ", basename($_[0]), " $DRY_RUN_MSG";
-    return 1 if $DRY_RUN;
+
+    _confirm("Downloading $_[0] => ", basename($_[0])) or return 1;
+
     getstore($_[0], basename($_[0])) or LOGDIE "Cannot download $_[0] ($!)";
 }
 
@@ -220,8 +263,7 @@ sub untar {
     LOGDIE "untar called without defined tarfile" unless 
          @_ == 1 and defined $_[0];
 
-    INFO "untar $_[0] $DRY_RUN_MSG";
-    return 1 if $DRY_RUN;
+    _confirm "untar $_[0]" or return 1;
 
     my($nice, $topdir, $namedir) = archive_sniff($_[0]);
 
@@ -273,8 +315,7 @@ sub untar_in {
     LOGDIE "not enough arguments" if
       ! defined $tar_file or ! defined $dir;
 
-    INFO "Untarring $tar_file in $dir $DRY_RUN_MSG";
-    return 1 if $DRY_RUN;
+    _confirm "Untarring $tar_file in $dir" or return 1;
 
     mkd($dir) unless -d $dir;
 
@@ -394,8 +435,9 @@ sub mkd {
 ###############################################
 
     local($Log::Log4perl::caller_depth) += 1;
-    INFO "mkd @_ $DRY_RUN_MSG";
-    return 1 if $DRY_RUN;
+
+    _confirm "mkd @_" or return 1;
+
     mkpath @_ or LOGDIE "Cannot mkdir @_ ($!)";
 }
 
@@ -413,13 +455,14 @@ sub rmf {
 ###############################################
 
     local($Log::Log4perl::caller_depth) += 1;
-    INFO "rmf $_[0] $DRY_RUN_MSG";
-    return 1 if $DRY_RUN;
+
+    _confirm "rmf $_[0]" or return 1;
 
     if(!-e $_[0]) {
         DEBUG "$_[0] doesn't exist - ignored";
         return;
     }
+
     rmtree $_[0] or LOGDIE "Cannot rmtree $_[0] ($!)";
 }
 
@@ -477,8 +520,7 @@ sub make {
 
     local($Log::Log4perl::caller_depth) += 1;
 
-    INFO "make @_ $DRY_RUN_MSG";
-    return 1 if $DRY_RUN;
+    _confirm "make @_" or return 1;
 
     system("make @_") and LOGDIE "Cannot make @_ ($!)";
 }
@@ -572,8 +614,7 @@ sub pie {
 
     for my $file (@files) {
 
-        INFO "editing $file in-place $DRY_RUN_MSG";
-        next if $DRY_RUN;
+        _confirm "editing $file in-place" or next;
 
         my $out = "";
 
@@ -612,8 +653,7 @@ sub plough {
 
     for my $file (@files) {
 
-        INFO "Ploughing through $file $DRY_RUN_MSG";
-        next if $DRY_RUN;
+        _confirm "Ploughing through $file" or next;
 
         my $out = "";
 
@@ -680,9 +720,8 @@ sub blurt {
 
     local($Log::Log4perl::caller_depth) += 1;
 
-    INFO(($append ? "Appending" : "Writing") . " " .
-         length($data) . " bytes to $file $DRY_RUN_MSG");
-    return 1 if $DRY_RUN;
+    _confirm(($append ? "Appending" : "Writing") . " " .
+         length($data) . " bytes to $file") or return 1;
 
     open FILE, ">" . ($append ? ">" : "") . $file 
         or LOGDIE "Cannot open $file for writing ($!)";
@@ -742,10 +781,7 @@ sub tap {
 
     local($Log::Log4perl::caller_depth) += 1;
 
-    if($DRY_RUN) {
-        INFO "tapping @args $DRY_RUN_MSG";
-        return 1;
-    }
+    _confirm "tapping @args" or return 1;
 
     my $opts = {};
 
@@ -916,8 +952,7 @@ sub perm_cp {
 
     local($Log::Log4perl::caller_depth) += 1;
 
-    INFO "perm_cp @_ $DRY_RUN_MSG";
-    return 1 if $DRY_RUN;
+    _confirm "perm_cp @_" or return 1;
 
     LOGDIE("usage: perm_cp src dst ...") if @_ < 2;
 
@@ -967,8 +1002,7 @@ sub perm_set {
 
     local($Log::Log4perl::caller_depth) += 1;
 
-    INFO "perm_set $filename (@$perms) $DRY_RUN_MSG";
-    return 1 if $DRY_RUN;
+    _confirm "perm_set $filename (@$perms)" or return 1;
 
     chown($perms->[1], $perms->[2], $filename) or 
         LOGDIE "Cannot chown $filename ($!)";
@@ -993,8 +1027,7 @@ sub sysrun {
 
     local($Log::Log4perl::caller_depth) += 1;
 
-    INFO "sysrun: @cmds $DRY_RUN_MSG";
-    return 1 if $DRY_RUN;
+    _confirm "sysrun: @cmds" or return 1;
 
     LOGDIE("usage: sysrun cmd ...") if @_ < 1;
 
@@ -1019,10 +1052,7 @@ sub hammer {
 
     local($Log::Log4perl::caller_depth) += 1;
 
-    if($DRY_RUN) {
-        INFO "Hammer: @cmds $DRY_RUN_MSG";
-        return 1 if $DRY_RUN;
-    }
+        _confirm "Hammer: @cmds" or return 1;
 
     my $exp = Expect->new();
     $exp->raw_pty(0);
@@ -1070,10 +1100,7 @@ sub sudo_me {
 
     local($Log::Log4perl::caller_depth) += 1;
 
-    if($DRY_RUN) {
-        INFO "sudo_me $DRY_RUN_MSG";
-        return 1;
-    }
+    _confirm "sudo_me" or return 1;
 
     $argv = \@ARGV unless $argv;
 

@@ -6,10 +6,13 @@ Revision history for Sysadm::Install
     (ms) Added interactive mode. If you call
          Sysadm::Install::confirm(1) before running Sysadm::Install
          commands, every writing function (cp(), mv(), untar(), pie(),
-         blurt(), ...) will ask the user to confirm before actually
-         performing what's been requested.
+         blurt(), ...) will ask the user for confirmation before actually
+         performing what's been requested. Sysadm::Install::confirm(0)
+	 switches back to normal.
     (ms) Added patch by Jud Dagnall to allow slurp() to process
-         @ARGS like <> does.
+         @ARGV like <> does.
+    (ms) Archive::Tar is no longer mandatory for installation, just
+         for using untar() and untar_in().
 
 0.16 2005/04/10
     (ms) Bumped up Log4perl reporting level. On typical S:I functions,

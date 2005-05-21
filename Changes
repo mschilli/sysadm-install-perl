@@ -2,6 +2,9 @@
 Revision history for Sysadm::Install
 ########################################
 
+0.18 (not yet released)
+    (ms) Requiring File::Temp 0.16 now (S:I needs OO-API).
+
 0.17 2005/04/23
     (ms) Added interactive mode. If you call
          Sysadm::Install::confirm(1) before running Sysadm::Install

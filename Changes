@@ -2,8 +2,10 @@
 Revision history for Sysadm::Install
 ########################################
 
-0.18 (not yet released)
+0.18 2005/07/14
     (ms) Requiring File::Temp 0.16 now (S:I needs OO-API).
+    (ms) Errors are now reported via croak(), which reports the location
+         in the calling script, not in Sysadm::Install.
 
 0.17 2005/04/23
     (ms) Added interactive mode. If you call

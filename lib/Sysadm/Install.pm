@@ -194,7 +194,8 @@ sub cp {
 
     _confirm("cp $_[0] $_[1]") or return 1;
 
-    File::Copy::copy @_ or LOGDIE "Cannot copy $_[0] to $_[1] ($!)";
+    File::Copy::copy @_ or 
+        get_logger("")->logcroak("Cannot copy $_[0] to $_[1] ($!)");
 }
 
 =pod
@@ -213,7 +214,8 @@ sub mv {
 
     _confirm("mv $_[0] $_[1]") or return 1;
 
-    File::Copy::move @_ or LOGDIE "Cannot move $_[0] to $_[1] ($!)";
+    File::Copy::move @_ or 
+        get_logger("")->logcroak("Cannot move $_[0] to $_[1] ($!)");
 }
 
 =pod
@@ -233,7 +235,8 @@ sub download {
 
     _confirm("Downloading $_[0] => ", basename($_[0])) or return 1;
 
-    getstore($_[0], basename($_[0])) or LOGDIE "Cannot download $_[0] ($!)";
+    getstore($_[0], basename($_[0])) or 
+        get_logger("")->logcroak("Cannot download $_[0] ($!)");
 }
 
 =pod
@@ -259,7 +262,7 @@ sub untar {
 ###############################################
     local($Log::Log4perl::caller_depth) += 1;
 
-    LOGDIE "untar called without defined tarfile" unless 
+    get_logger("")->logcroak("untar called without defined tarfile") unless 
          @_ == 1 and defined $_[0];
 
     _confirm "untar $_[0]" or return 1;
@@ -281,9 +284,9 @@ sub untar {
             # extract as topdir
         $arch->extract();
         rename $topdir, $namedir or 
-            LOGDIE "Can't rename $topdir, $namedir";
+            get_logger("")->logcroak("Can't rename $topdir, $namedir");
     } else {
-        LOGDIE "no topdir" unless defined $topdir;
+        get_logger("")->logcroak("no topdir") unless defined $topdir;
         DEBUG "Not-so-nice archive (no topdir), extracting to subdir $topdir";
         $topdir = basename $topdir;
         rmf($topdir);
@@ -312,7 +315,7 @@ sub untar_in {
 
     local($Log::Log4perl::caller_depth) += 1;
 
-    LOGDIE "not enough arguments" if
+    get_logger("")->logcroak("not enough arguments") if
       ! defined $tar_file or ! defined $dir;
 
     _confirm "Untarring $tar_file in $dir" or return 1;
@@ -326,7 +329,8 @@ sub untar_in {
     check_zlib($tar_file_abs);
     require Archive::Tar;
     my $arch = Archive::Tar->new("$tar_file_abs");
-    $arch->extract() or LOGDIE "Extract failed: $!";
+    $arch->extract() or 
+        get_logger("")->logcroak("Extract failed: $!");
     cdback();
 }
 
@@ -369,7 +373,7 @@ sub pick {
     my %files;
 
     if(@_ != 3 or ref($options) ne "ARRAY") {
-        LOGDIE "pick called with wrong #/type of args";
+        get_logger("")->logcroak("pick called with wrong #/type of args");
     }
     
     {
@@ -411,7 +415,7 @@ sub ask {
     local($Log::Log4perl::caller_depth) += 1;
 
     if(@_ != 2) {
-        LOGDIE "ask() called with wrong # of args";
+        get_logger("")->logcroak("ask() called with wrong # of args");
     }
 
     print STDERR "$prompt [$default]> ";
@@ -439,7 +443,8 @@ sub mkd {
 
     _confirm "mkd @_" or return 1;
 
-    mkpath @_ or LOGDIE "Cannot mkdir @_ ($!)";
+    mkpath @_ or 
+        get_logger("")->logcroak("Cannot mkdir @_ ($!)");
 }
 
 =pod
@@ -464,7 +469,8 @@ sub rmf {
         return;
     }
 
-    rmtree $_[0] or LOGDIE "Cannot rmtree $_[0] ($!)";
+    rmtree $_[0] or 
+        get_logger("")->logcroak("Cannot rmtree $_[0] ($!)");
 }
 
 =pod
@@ -483,7 +489,8 @@ sub cd {
     INFO "cd $_[0]";
 
     push @DIR_STACK, getcwd();
-    chdir($_[0]) or LOGDIE("Cannot cd $_[0] ($!)");
+    chdir($_[0]) or 
+        get_logger("")->logcroak("Cannot cd $_[0] ($!)");
 }
 
 =pod
@@ -500,7 +507,7 @@ sub cdback {
 
     local($Log::Log4perl::caller_depth) += 1;
 
-    LOGDIE "cd stack empty" unless @DIR_STACK;
+    get_logger("")->logcroak("cd stack empty") unless @DIR_STACK;
 
     my $old_dir = pop @DIR_STACK;
     INFO "cdback to $old_dir";
@@ -523,7 +530,8 @@ sub make {
 
     _confirm "make @_" or return 1;
 
-    system("make @_") and LOGDIE "Cannot make @_ ($!)";
+    system("make @_") and 
+        get_logger("")->logcroak("Cannot make @_ ($!)");
 }
 
 =pod
@@ -538,8 +546,8 @@ sub check_zlib {
     if($tar_file =~ /\.tar\.gz\b|\.tgz\b/ and
        !Log::Log4perl::Util::module_available("IO::Zlib")) {
 
-        LOGDIE "$tar_file: Compressed tarballs can only be processed",
-               " with IO::Zlib installed.";
+        get_logger("")->logcroak("$tar_file: Compressed tarballs can ",
+               "only be processed with IO::Zlib installed.");
     }
 }
      
@@ -568,7 +576,7 @@ sub archive_sniff {
 
     my @names = $tar->list_files(["name"]);
 
-    LOGDIE "Archive $name is empty" unless @names;
+    get_logger("")->logcroak("Archive $name is empty") unless @names;
 
     (my $archdir = $names[0]) =~ s#/.*##;
 
@@ -620,7 +628,8 @@ sub pie {
 
         my $out = "";
 
-        open FILE, "<$file" or LOGDIE "Cannot open $file ($!)";
+        open FILE, "<$file" or 
+            get_logger("")->logcroak("Cannot open $file ($!)");
         while(<FILE>) {
             $out .= $coderef->($_);
         }
@@ -659,7 +668,8 @@ sub plough {
 
         my $out = "";
 
-        open FILE, "<$file" or LOGDIE "Cannot open $file ($!)";
+        open FILE, "<$file" or 
+            get_logger("")->logcroak("Cannot open $file ($!)");
         while(<FILE>) {
             $coderef->($_);
         }
@@ -692,7 +702,8 @@ sub slurp {
 
     if($from_file) {
         INFO "Slurping data from $file";
-        open FILE, "<$file" or LOGDIE "Cannot open $file ($!)";
+        open FILE, "<$file" or 
+            get_logger("")->logcroak("Cannot open $file ($!)");
         $data = <FILE>;
         close FILE;
         DEBUG "Read ", snip($data, $DATA_SNIPPED_LEN), " from $file";
@@ -726,7 +737,8 @@ sub blurt {
          length($data) . " bytes to $file") or return 1;
 
     open FILE, ">" . ($append ? ">" : "") . $file 
-        or LOGDIE "Cannot open $file for writing ($!)";
+        or 
+        get_logger("")->logcroak("Cannot open $file for writing ($!)");
     print FILE $data;
     close FILE;
 
@@ -808,7 +820,8 @@ sub tap {
     $cmd = "$cmd 2>$tmpfile |";
     INFO "tapping $cmd";
 
-    open PIPE, $cmd or LOGDIE "open $cmd | failed ($!)";
+    open PIPE, $cmd or 
+        get_logger("")->logcroak("open $cmd | failed ($!)");
     my $stdout = join '', <PIPE>;
     close PIPE;
 
@@ -956,7 +969,7 @@ sub perm_cp {
 
     _confirm "perm_cp @_" or return 1;
 
-    LOGDIE("usage: perm_cp src dst ...") if @_ < 2;
+    get_logger("")->logcroak("usage: perm_cp src dst ...") if @_ < 2;
 
     my $perms = perm_get($_[0]);
     perm_set($_[1], $perms);
@@ -980,7 +993,8 @@ sub perm_get {
     local($Log::Log4perl::caller_depth) += 1;
 
     my @stats = (stat $filename)[2,4,5] or
-        LOGDIE "Cannot stat $filename ($!)";
+        
+        get_logger("")->logcroak("Cannot stat $filename ($!)");
 
     INFO "perm_get $filename (@stats)";
 
@@ -1007,9 +1021,11 @@ sub perm_set {
     _confirm "perm_set $filename (@$perms)" or return 1;
 
     chown($perms->[1], $perms->[2], $filename) or 
-        LOGDIE "Cannot chown $filename ($!)";
+        
+        get_logger("")->logcroak("Cannot chown $filename ($!)");
     chmod($perms->[0] & 07777,    $filename) or
-        LOGDIE "Cannot chmod $filename ($!)";
+        
+        get_logger("")->logcroak("Cannot chmod $filename ($!)");
 }
 
 =pod
@@ -1031,9 +1047,10 @@ sub sysrun {
 
     _confirm "sysrun: @cmds" or return 1;
 
-    LOGDIE("usage: sysrun cmd ...") if @_ < 1;
+    get_logger("")->logcroak("usage: sysrun cmd ...") if @_ < 1;
 
-    system(@cmds) and LOGDIE "@cmds failed ($!)";
+    system(@cmds) and 
+        get_logger("")->logcroak("@cmds failed ($!)");
 }
 
 =pod
@@ -1111,8 +1128,9 @@ sub sudo_me {
     if($> != 0) {
         DEBUG "Not running as root, calling sudo $0 @$argv";
         my $sudo = bin_find("sudo");
-        LOGDIE "Can't find sudo in PATH" unless $sudo;
-        exec($sudo, $0, @$argv) or LOGDIE "exec failed!";
+        get_logger("")->logcroak("Can't find sudo in PATH") unless $sudo;
+        exec($sudo, $0, @$argv) or 
+            get_logger("")->logcroak("exec failed!");
     }
 }
 
@@ -1160,17 +1178,18 @@ sub fs_read_open {
     local($Log::Log4perl::caller_depth) += 1;
 
     my $find = bin_find("find");
-    LOGDIE "Cannot find 'find'" unless defined $find;
+    get_logger("")->logcroak("Cannot find 'find'") unless defined $find;
 
     my $cpio = bin_find("cpio");
-    LOGDIE "Cannot find 'cpio'" unless defined $cpio;
+    get_logger("")->logcroak("Cannot find 'cpio'") unless defined $cpio;
 
     cd $dir;
  
     my $cmd = "$find . -xdev -print0 | $cpio -o0 --quiet 2>/dev/null ";
 
     DEBUG "Reading from $cmd";
-    open my $in, "$cmd |" or LOGDIE "Cannot open $cmd";
+    open my $in, "$cmd |" or 
+        get_logger("")->logcroak("Cannot open $cmd");
 
     cdback;
 
@@ -1198,7 +1217,7 @@ sub fs_write_open {
     local($Log::Log4perl::caller_depth) += 1;
 
     my $cpio = bin_find("cpio");
-    LOGDIE "Cannot find 'cpio'" unless defined $cpio;
+    get_logger("")->logcroak("Cannot find 'cpio'") unless defined $cpio;
 
     mkd $dir unless -d $dir;
 
@@ -1207,7 +1226,8 @@ sub fs_write_open {
     my $cmd = "$cpio -i0 --quiet";
 
     DEBUG "Writing to $cmd in dir $dir";
-    open my $out, "| $cmd" or LOGDIE "Cannot open $cmd";
+    open my $out, "| $cmd" or 
+        get_logger("")->logcroak("Cannot open $cmd");
 
     cdback;
 

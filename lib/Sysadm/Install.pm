@@ -6,7 +6,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 use File::Copy;
 use File::Path;

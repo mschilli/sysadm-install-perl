@@ -5,7 +5,6 @@ version:      0.18
 version_from: lib/Sysadm/Install.pm
 installdirs:  site
 requires:
-    Archive::Tar:                  1.23
     Cwd:                           0
     File::Basename:                0
     File::Copy:                    0

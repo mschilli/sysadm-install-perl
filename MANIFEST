@@ -20,5 +20,6 @@ t/006perm.t
 t/007fs.t
 t/008dry.t
 t/009snip.t
+t/010carp.t
 t/canned/test.tar
 t/canned/testa.tar

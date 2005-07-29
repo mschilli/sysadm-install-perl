@@ -322,7 +322,7 @@ sub untar_in {
 
     mkd($dir) unless -d $dir;
 
-    my $tar_file_abs = rel2abs($tar_file, dirname($tar_file));
+    my $tar_file_abs = rel2abs($tar_file);
 
     cd($dir);
 

@@ -32,7 +32,7 @@ WriteMakefile(
     VERSION_FROM      => 'lib/Sysadm/Install.pm', # finds $VERSION
     EXE_FILES         => ['eg/one-liner'],
     PREREQ_PM         => {
-        Log::Log4perl   => 0.48,
+        Log::Log4perl   => 1.00,
         File::Copy      => 0,
         File::Path      => 0,
         File::Basename  => 0,

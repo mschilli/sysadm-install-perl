@@ -2,6 +2,10 @@
 Revision history for Sysadm::Install
 ########################################
 
+0.20 2005/08/13
+    (ms) Requiring Log4perl-1.00 now to avoid a problem with the
+         test suite.
+
 0.19 2005/07/28
     (ms) Greg Olszewski reported a bug in untar_in() with tarfiles
          on relative paths, fixed by using one-argument version of

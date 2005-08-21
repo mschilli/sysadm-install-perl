@@ -11,10 +11,6 @@ Revision history for Sysadm::Install
          on relative paths, fixed by using one-argument version of
          rel2abs.
 
-0.19 2005/07/28
-
-0.19 2005/07/28
-
 0.18 2005/07/14
     (ms) Requiring File::Temp 0.16 now (S:I needs OO-API).
     (ms) Errors are now reported via croak(), which reports the location

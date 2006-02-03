@@ -194,6 +194,8 @@ sub cp {
 
     _confirm("cp $_[0] $_[1]") or return 1;
 
+    INFO "cp $_[0] $_[1]";
+
     File::Copy::copy @_ or 
         get_logger("")->logcroak("Cannot copy $_[0] to $_[1] ($!)");
 }
@@ -214,6 +216,8 @@ sub mv {
 
     _confirm("mv $_[0] $_[1]") or return 1;
 
+    INFO "mv $_[0] $_[1]";
+
     File::Copy::move @_ or 
         get_logger("")->logcroak("Cannot move $_[0] to $_[1] ($!)");
 }
@@ -232,6 +236,8 @@ sub download {
 ###############################################
 
     local($Log::Log4perl::caller_depth) += 1;
+
+    INFO "download $_[0]";
 
     _confirm("Downloading $_[0] => ", basename($_[0])) or return 1;
 
@@ -443,6 +449,8 @@ sub mkd {
 
     _confirm "mkd @_" or return 1;
 
+    INFO "mkpath @_";
+
     mkpath @_ or 
         get_logger("")->logcroak("Cannot mkdir @_ ($!)");
 }
@@ -468,6 +476,8 @@ sub rmf {
         DEBUG "$_[0] doesn't exist - ignored";
         return;
     }
+
+    INFO "rmtree @_";
 
     rmtree $_[0] or 
         get_logger("")->logcroak("Cannot rmtree $_[0] ($!)");
@@ -529,6 +539,8 @@ sub make {
     local($Log::Log4perl::caller_depth) += 1;
 
     _confirm "make @_" or return 1;
+
+    INFO "make @_";
 
     system("make @_") and 
         get_logger("")->logcroak("Cannot make @_ ($!)");

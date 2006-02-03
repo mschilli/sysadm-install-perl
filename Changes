@@ -2,6 +2,9 @@
 Revision history for Sysadm::Install
 ########################################
 
+0.21 2006/02/02
+    (ms) Added log messages to cp, mv, download, make.
+
 0.20 2005/08/13
     (ms) Requiring Log4perl-1.00 now to avoid a problem with the
          test suite.

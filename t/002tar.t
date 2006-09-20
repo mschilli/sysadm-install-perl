@@ -2,13 +2,25 @@
 # Tests for Sysadm::Install/s untar()
 #####################################
 
-use Test::More tests => 9;
+use Test::More;
 
 use Sysadm::Install qw(:all);
 use File::Spec;
 use File::Path;
 #use Log::Log4perl qw(:easy);
 #Log::Log4perl->easy_init($DEBUG);
+
+BEGIN {
+    eval {
+        require Archive::Tar;
+    };
+
+    if ($@) {
+        plan skip_all => "Skipping Archive::Tar tests (not installed)";
+    } else {
+        plan tests => 9;
+    }
+}
 
 my $TEST_DIR = ".";
 $TEST_DIR = "t" if -d 't';

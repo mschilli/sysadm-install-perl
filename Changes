@@ -2,8 +2,15 @@
 Revision history for Sysadm::Install
 ########################################
 
+0.22 2006/09/19
+    (ms) Skipping Archive::Tar tests if A:T isn't installed
+
 0.21 2006/02/02
     (ms) Added log messages to cp, mv, download, make.
+    (ms) untar() and untar_in() now pass the cwd value to
+         Archive::Tar's extract function to avoid excessive
+         and expensive cwd() calls (thanks to Greg Olszewski
+         for finding this performance bottleneck).
 
 0.20 2005/08/13
     (ms) Requiring Log4perl-1.00 now to avoid a problem with the

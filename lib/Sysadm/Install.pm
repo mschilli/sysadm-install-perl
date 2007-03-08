@@ -6,7 +6,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 
 use File::Copy;
 use File::Path;
@@ -942,7 +942,37 @@ sub qquote {
 
 =item C<$quoted_string = quote($string, [$metachars])>
 
-Similar to C<qquote()>, just puts a string in single quotes.
+Similar to C<qquote()>, just puts a string in single quotes and
+escapes what needs to be escaped.
+
+Note that shells typically don't support escaped single quotes within
+single quotes, which means that
+
+    $ echo 'foo\'bar'
+    >
+
+is invalid and the shell waits until it finds a closing quote. 
+Instead, there is an evil trick which gives the desired result:
+
+    $ echo 'foo'\''bar'  # foo, single quote, \, 2 x single quote, bar
+    foo'bar
+
+It uses the fact that shells interpret back-to-back strings as one.
+The construct above consists of three back-to-back strings: 
+
+    (1) 'foo'
+    (2) '
+    (3) 'bar'
+
+which all get concatenated to a single 
+
+    foo'bar
+
+If you call C<quote()> with C<$metachars> set to ":shell", it will
+perform that magic behind the scenes:
+
+    print quote("foo'bar");
+      # prints: 'foo'\''bar'
 
 =cut
 
@@ -951,10 +981,14 @@ sub quote {
 ###############################################
     my($str, $metas) = @_;
 
-    $str =~ s/([\\'])/\\$1/g;
+    if(defined $metas and $metas eq ":shell") {
+        $str =~ s/([\\])/\\$1/g;
+        $str =~ s/(['])/'\\''/g;
+    } else {
+        $str =~ s/([\\'])/\\$1/g;
+    }
 
-    if(defined $metas) {
-        $metas = '' if $metas eq ":shell";
+    if(defined $metas and $metas ne ":shell") {
         $metas =~ s/\]/\\]/g;
         $str =~ s/([$metas])/\\$1/g;
     }

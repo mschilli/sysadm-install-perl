@@ -2,7 +2,7 @@
 # Tests for Sysadm::Install/s plough
 #############################################
 
-use Test::More tests => 4;
+use Test::More tests => 5;
 
 use Sysadm::Install qw(:all);
 
@@ -29,3 +29,7 @@ is($escaped, '"[some]\\$thing(weird)\\"\\`"', ":shell");
     # single quote
 $escaped = quote("[some]\$thing(weird)'`");
 is($escaped, "'[some]\$thing(weird)\\'`'", "single quote");
+
+    # single quote containing single quote
+$escaped = quote("foo'bar", ":shell");
+is($escaped, "'foo'\\''bar'", "foo'bar");

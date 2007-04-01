@@ -1371,7 +1371,7 @@ sub printable {
 Reads in a password to be typed in by the user in noecho mode.
 A call to read_password("password: ") results in
 
-    password: *****
+    password: ***** (stars aren't actually displayed)
 
 This function will switch the terminal back into normal mode
 after the user hits the 'Return' key.

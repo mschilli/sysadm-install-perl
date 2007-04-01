@@ -81,7 +81,7 @@ sysrun untar_in pick ask
 hammer say
 sudo_me bin_find
 fs_read_open fs_write_open pipe_copy
-snip
+snip password_read nice_time
 );
 
 our %EXPORTABLE = map { $_ => 1 } @EXPORTABLE;

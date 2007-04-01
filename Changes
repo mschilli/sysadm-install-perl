@@ -2,7 +2,8 @@
 Revision history for Sysadm::Install
 ########################################
 
-0.23 2007/03/08
+0.23 2007/04/01
+    (ms) Added nice_time() and password_read().
     (ms) Fixed quote($str, ":shell") to escape single quotes within
          single quotes in a shell-compatible way.
 

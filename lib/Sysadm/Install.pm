@@ -1389,6 +1389,8 @@ sub password_read {
     print "$prompt";
     my $pw = ReadLine 0;
     chomp $pw;
+    ReadMode 'restore';
+    print "\n";
 
     return $pw;
 }

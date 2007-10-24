@@ -6,7 +6,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 use File::Copy;
 use File::Path;
@@ -82,6 +82,7 @@ hammer say
 sudo_me bin_find
 fs_read_open fs_write_open pipe_copy
 snip password_read nice_time
+def_or
 );
 
 our %EXPORTABLE = map { $_ => 1 } @EXPORTABLE;
@@ -1428,6 +1429,48 @@ sub nice_time {
     return sprintf("%d/%02d/%02d %02d:%02d:%02d",
      $year+1900, $mon+1, $mday,
      $hour, $min, $sec);
+}
+
+=item C<def_or($foo, $default)>
+
+Perl-5.9 added the //= construct, which helps assigning values to
+undefined variables. Instead of writing
+
+    if(!defined $foo) {
+        $foo = $default;
+    }
+
+you can just write
+
+    $foo //= $default;
+
+However, this is not available on older perl versions (although there's 
+source filter solutions). Often, people use
+
+    $foo ||= $default;
+
+instead which is wrong if $foo contains a value that evaluates as false.
+So Sysadm::Install, the everything-and-the-kitchen-sink under the CPAN
+modules, provides the function C<def_or()> which can be used like
+
+    def_or($foo, $default); 
+
+to accomplish the same as
+
+    $foo //= $default;
+
+How does it work, how does $foo get a different value, although it's 
+apparently passed in by value? Modifying $_[0] within the subroutine
+is an old Perl trick to do exactly that.
+
+=cut
+
+###########################################
+sub def_or($$) {
+###########################################
+    if(! defined $_[0]) {
+        $_[0] = $_[1];
+    }
 }
 
 =pod

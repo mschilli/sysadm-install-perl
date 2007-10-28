@@ -2,7 +2,7 @@
 # Tests for Sysadm::Install/s slurp/blurt/pie
 #############################################
 
-use Test::More tests => 4;
+use Test::More tests => 5;
 use strict;
 use warnings;
 
@@ -24,6 +24,12 @@ END { unlink $TMP_FILE }
 # Blurt
 #####################################################################
 blurt("one\ntwo\nthree", $TMP_FILE);
+ok(-f $TMP_FILE, "$TMP_FILE exists");
+
+#####################################################################
+# Blurt atomically
+#####################################################################
+blurt_atomic("one\ntwo\nthree", $TMP_FILE);
 ok(-f $TMP_FILE, "$TMP_FILE exists");
 
 #####################################################################

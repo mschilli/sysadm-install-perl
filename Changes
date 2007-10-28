@@ -4,6 +4,10 @@ Revision history for Sysadm::Install
 
 0.24 2007/10/24
     (ms) Added def_or() function to emulate the //= operator
+    (ms) Added blurt_atomic() to write data to a file, guaranteeing that
+         the operation either fully succeeds or fails. It makes sure that
+         we're not left with a partially written file in case the
+         operation gets interrupted.
 
 0.23 2007/04/01
     (ms) Added nice_time() and password_read().
@@ -40,7 +44,7 @@ Revision history for Sysadm::Install
          commands, every writing function (cp(), mv(), untar(), pie(),
          blurt(), ...) will ask the user for confirmation before actually
          performing what's been requested. Sysadm::Install::confirm(0)
-	 switches back to normal.
+         switches back to normal.
     (ms) Added patch by Jud Dagnall to allow slurp() to process
          @ARGV like <> does.
     (ms) Archive::Tar is no longer mandatory for installation, just

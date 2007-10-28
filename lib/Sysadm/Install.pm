@@ -16,7 +16,7 @@ use LWP::Simple;
 use File::Basename;
 use File::Spec::Functions qw(rel2abs abs2rel);
 use Cwd;
-use File::Temp;
+use File::Temp qw(tempfile);
 
 our $DRY_RUN;
 our $CONFIRM;
@@ -82,7 +82,7 @@ hammer say
 sudo_me bin_find
 fs_read_open fs_write_open pipe_copy
 snip password_read nice_time
-def_or
+def_or blurt_atomic
 );
 
 our %EXPORTABLE = map { $_ => 1 } @EXPORTABLE;
@@ -746,6 +746,8 @@ sub blurt {
 
     local($Log::Log4perl::caller_depth) += 1;
 
+    $append = 0 unless defined $append;
+
     _confirm(($append ? "Appending" : "Writing") . " " .
          length($data) . " bytes to $file") or return 1;
 
@@ -756,6 +758,36 @@ sub blurt {
     close FILE;
 
     DEBUG "Wrote ", snip($data, $DATA_SNIPPED_LEN), " to $file";
+}
+
+=pod
+
+=item C<blurt_atomic($data, $file)>
+
+Write the data in $data to a file $file, guaranteeing that the operation
+will either complete fully or not at all. This is accomplished by first
+writing to a temporary file which is then rename()ed to the target file.
+
+Unlike in C<blurt>, there is no C<$append> mode in C<blurt_atomic>.
+
+=cut
+
+###############################################
+sub blurt_atomic {
+###############################################
+    my($data, $file) = @_;
+
+    _confirm("Writing atomically " .
+         length($data) . " bytes to $file") or return 1;
+
+    my($fh, $tmpname) = tempfile(DIR => dirname($file));
+
+    blurt($data, $tmpname);
+
+    rename $tmpname, $file or
+        LOGDIE "Can't rename $tmpname to $file";
+
+    DEBUG "Wrote ", snip($data, $DATA_SNIPPED_LEN), " atomically to $file";
 }
 
 =pod

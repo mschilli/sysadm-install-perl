@@ -1399,10 +1399,10 @@ sub printable {
 
 =pod
 
-=item C<read_password($prompt)>
+=item C<password_read($prompt)>
 
 Reads in a password to be typed in by the user in noecho mode.
-A call to read_password("password: ") results in
+A call to password_read("password: ") results in
 
     password: ***** (stars aren't actually displayed)
 

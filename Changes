@@ -8,6 +8,7 @@ Revision history for Sysadm::Install
          the operation either fully succeeds or fails. It makes sure that
          we're not left with a partially written file in case the
          operation gets interrupted.
+    (ms) fixed password_read() documentation bug
 
 0.23 2007/04/01
     (ms) Added nice_time() and password_read().

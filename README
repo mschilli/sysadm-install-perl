@@ -1,5 +1,5 @@
 ######################################################################
-    Sysadm::Install 0.23
+    Sysadm::Install 0.24
 ######################################################################
 
 NAME
@@ -161,6 +161,14 @@ DESCRIPTION
         Opens a new file, prints the data in $data to it and closes the
         file. If $append is set to a true value, data will be appended to
         the file. Default is false, existing files will be overwritten.
+
+    "blurt_atomic($data, $file)"
+        Write the data in $data to a file $file, guaranteeing that the
+        operation will either complete fully or not at all. This is
+        accomplished by first writing to a temporary file which is then
+        rename()ed to the target file.
+
+        Unlike in "blurt", there is no $append mode in "blurt_atomic".
 
     "($stdout, $stderr, $exit_code) = tap($cmd, @args)"
         Run a command $cmd in the shell, and pass it @args as args. Capture
@@ -378,9 +386,9 @@ DESCRIPTION
         indicating the length of the original string, the beginning, the
         end, and the number of 'snipped' characters.
 
-    "read_password($prompt)"
+    "password_read($prompt)"
         Reads in a password to be typed in by the user in noecho mode. A
-        call to read_password("password: ") results in
+        call to password_read("password: ") results in
 
             password: ***** (stars aren't actually displayed)
 
@@ -402,6 +410,38 @@ DESCRIPTION
 
         It uses localtime() under the hood, so the outcome of the above will
         depend on your local time zone setting.
+
+    "def_or($foo, $default)"
+        Perl-5.9 added the //= construct, which helps assigning values to
+        undefined variables. Instead of writing
+
+            if(!defined $foo) {
+                $foo = $default;
+            }
+
+        you can just write
+
+            $foo //= $default;
+
+        However, this is not available on older perl versions (although
+        there's source filter solutions). Often, people use
+
+            $foo ||= $default;
+
+        instead which is wrong if $foo contains a value that evaluates as
+        false. So Sysadm::Install, the everything-and-the-kitchen-sink under
+        the CPAN modules, provides the function "def_or()" which can be used
+        like
+
+            def_or($foo, $default); 
+
+        to accomplish the same as
+
+            $foo //= $default;
+
+        How does it work, how does $foo get a different value, although it's
+        apparently passed in by value? Modifying $_[0] within the subroutine
+        is an old Perl trick to do exactly that.
 
 AUTHOR
     Mike Schilli, <m@perlmeister.com>

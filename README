@@ -1,5 +1,5 @@
 ######################################################################
-    Sysadm::Install 0.24
+    Sysadm::Install 0.25
 ######################################################################
 
 NAME
@@ -118,7 +118,11 @@ DESCRIPTION
         the shell.
 
     "cd($dir)"
-        chdir to the given directory.
+        chdir to the given directory. If you don't want to have cd() modify
+        the internal directory stack (used for subsequent cdback() calls),
+        set the stack_update parameter to a false value:
+
+            cd($dir, {stack_update => 0});
 
     "cdback()"
         chdir back to the last directory before a previous "cd".

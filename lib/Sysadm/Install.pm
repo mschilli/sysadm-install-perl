@@ -6,7 +6,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 use File::Copy;
 use File::Path;
@@ -488,7 +488,11 @@ sub rmf {
 
 =item C<cd($dir)>
 
-chdir to the given directory.
+chdir to the given directory. If you don't want to have cd() modify
+the internal directory stack (used for subsequent cdback() calls), 
+set the stack_update parameter to a false value:
+
+    cd($dir, {stack_update => 0});
 
 =cut
 
@@ -499,7 +503,10 @@ sub cd {
     local($Log::Log4perl::caller_depth) += 1;
     INFO "cd $_[0]";
 
-    push @DIR_STACK, getcwd();
+    my $opts = { stack_update => 1 };
+    $opts = $_[1] if ref $_[1] eq "HASH";
+
+    push @DIR_STACK, getcwd() if $opts->{stack_update};
     chdir($_[0]) or 
         get_logger("")->logcroak("Cannot cd $_[0] ($!)");
 }
@@ -522,7 +529,7 @@ sub cdback {
 
     my $old_dir = pop @DIR_STACK;
     INFO "cdback to $old_dir";
-    cd($old_dir);
+    cd($old_dir, {stack_update => 0});
 }
 
 =pod

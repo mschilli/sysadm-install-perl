@@ -2,6 +2,9 @@
 Revision history for Sysadm::Install
 ########################################
 
+0.25 2008/02/07
+    (ms) Fixed directory stack bug in cdback()
+
 0.24 2007/10/24
     (ms) Added def_or() function to emulate the //= operator
     (ms) Added blurt_atomic() to write data to a file, guaranteeing that

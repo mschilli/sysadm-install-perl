@@ -6,7 +6,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.25';
+our $VERSION = '0.26';
 
 use File::Copy;
 use File::Path;
@@ -77,6 +77,7 @@ cp rmf mkd cd make
 cdback download untar 
 pie slurp blurt mv tap 
 plough qquote quote perm_cp
+perm_get perm_set
 sysrun untar_in pick ask
 hammer say
 sudo_me bin_find

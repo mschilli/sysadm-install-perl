@@ -2,6 +2,9 @@
 Revision history for Sysadm::Install
 ########################################
 
+0.26 (not yet released)
+    (ms) Added perm_get/set to export list
+
 0.25 2008/02/07
     (ms) Fixed directory stack bug in cdback()
 

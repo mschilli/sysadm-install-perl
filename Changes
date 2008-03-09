@@ -3,6 +3,7 @@ Revision history for Sysadm::Install
 ########################################
 
 0.26 (not yet released)
+    (ms) Added rc/stdout/stderr debug output to tap()
     (ms) Added perm_get/set to export list
 
 0.25 2008/02/07

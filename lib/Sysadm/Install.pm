@@ -882,6 +882,8 @@ sub tap {
 
     my $stderr = slurp($tmpfile);
 
+    DEBUG "tap $cmd results: rc=$exit_code stderr=[$stderr] stdout=[$stdout]";
+
     return ($stdout, $stderr, $exit_code);
 }
 

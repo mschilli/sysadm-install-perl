@@ -867,7 +867,7 @@ sub tap {
         $cmd = join ' ', map { qquote($_, ":shell") } @args;
     } else {
             # Default mode: Single quotes
-        $cmd = join ' ', map { quote($_) } @args;
+        $cmd = join ' ', map { quote($_, ":shell") } @args;
     }
        
     $cmd = "$cmd 2>$tmpfile |";

@@ -2,6 +2,9 @@
 Revision history for Sysadm::Install
 ########################################
 
+0.27 2008/03/26
+    (ms) Fixes a broken CPAN upload.
+
 0.26 2008/03/25
     (ms) Added rc/stdout/stderr debug output to tap()
     (ms) Added perm_get/set to export list

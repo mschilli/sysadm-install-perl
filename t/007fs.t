@@ -17,18 +17,22 @@ $TEST_DIR = "t" if -d 't';
 
 ok(1, "loading ok");
 
-rmf "$TEST_DIR/tmp";
+SKIP: {
 
-my $read = fs_read_open("$TEST_DIR");
-my $cpio = join '', <$read>;
-close $read;
+    rmf "$TEST_DIR/tmp";
+    if(!bin_find("cpio")) {
+        skip "No cpio on this system", 1;
+    }
 
-#print "Length: ", length $cpio, "\n";
+    my $read = fs_read_open("$TEST_DIR");
+    my $cpio = join '', <$read>;
+    close $read;
 
-my $write = fs_write_open("$TEST_DIR/tmp");
-print $write $cpio;
-close $write;
+    my $write = fs_write_open("$TEST_DIR/tmp");
+    print $write $cpio;
+    close $write;
 
-ok(-f "$TEST_DIR/007fs.t", "cpio worked");
+    ok(-f "$TEST_DIR/007fs.t", "cpio worked");
 
-rmf "$TEST_DIR/tmp";
+    rmf "$TEST_DIR/tmp";
+}

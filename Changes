@@ -2,6 +2,10 @@
 Revision history for Sysadm::Install
 ########################################
 
+0.28 (not yet released)
+    (ms) Skipping fs_read_open test case if there's no cpio on 
+         the target system (reported for armv5tejl-linux).
+
 0.27 2008/03/26
     (ms) Fixes a broken CPAN upload.
 

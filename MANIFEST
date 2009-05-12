@@ -7,9 +7,8 @@ eg/tap
 eg/untar_in
 lib/Sysadm/Install.pm
 Makefile.PL
-MANIFEST
+MANIFEST			This list of files
 MANIFEST.SKIP
-META.yml			Module meta-data (added by MakeMaker)
 README
 t/001.t
 t/002tar.t
@@ -23,5 +22,6 @@ t/009snip.t
 t/010carp.t
 t/011defor.t
 t/012tap.t
+t/013download.t
 t/canned/test.tar
 t/canned/testa.tar

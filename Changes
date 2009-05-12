@@ -2,9 +2,11 @@
 Revision history for Sysadm::Install
 ########################################
 
-0.28 (not yet released)
+0.28 2009/05/11
     (ms) Skipping fs_read_open test case if there's no cpio on 
          the target system (reported for armv5tejl-linux).
+    (ms) Fixed download() with a better check for getstore(), 
+         suggested by Bernhard Minks.
 
 0.27 2008/03/26
     (ms) Fixes a broken CPAN upload.

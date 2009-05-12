@@ -236,15 +236,21 @@ name returned by C<basename($url)>.
 ###############################################
 sub download {
 ###############################################
+    my($url) = @_;
 
     local($Log::Log4perl::caller_depth) += 1;
 
-    INFO "download $_[0]";
+    INFO "download $url";
 
-    _confirm("Downloading $_[0] => ", basename($_[0])) or return 1;
+    _confirm("Downloading $url => ", basename($url)) or return 1;
 
-    getstore($_[0], basename($_[0])) or 
+    my $rc = getstore($url, basename($_[0]));
+    
+    if($rc != RC_OK) {
         get_logger("")->logcroak("Cannot download $_[0] ($!)");
+    }
+
+    return 1;
 }
 
 =pod

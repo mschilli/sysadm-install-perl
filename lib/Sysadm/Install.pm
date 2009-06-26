@@ -6,7 +6,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.28';
+our $VERSION = '0.29';
 
 use File::Copy;
 use File::Path;
@@ -199,7 +199,7 @@ sub cp {
     INFO "cp $_[0] $_[1]";
 
     File::Copy::copy @_ or 
-        get_logger("")->logcroak("Cannot copy $_[0] to $_[1] ($!)");
+        LOGCROAK("Cannot copy $_[0] to $_[1] ($!)");
 }
 
 =pod
@@ -221,7 +221,7 @@ sub mv {
     INFO "mv $_[0] $_[1]";
 
     File::Copy::move @_ or 
-        get_logger("")->logcroak("Cannot move $_[0] to $_[1] ($!)");
+        LOGCROAK("Cannot move $_[0] to $_[1] ($!)");
 }
 
 =pod
@@ -247,7 +247,7 @@ sub download {
     my $rc = getstore($url, basename($_[0]));
     
     if($rc != RC_OK) {
-        get_logger("")->logcroak("Cannot download $_[0] ($!)");
+        LOGCROAK("Cannot download $_[0] ($!)");
     }
 
     return 1;
@@ -276,7 +276,7 @@ sub untar {
 ###############################################
     local($Log::Log4perl::caller_depth) += 1;
 
-    get_logger("")->logcroak("untar called without defined tarfile") unless 
+    LOGCROAK("untar called without defined tarfile") unless 
          @_ == 1 and defined $_[0];
 
     _confirm "untar $_[0]" or return 1;
@@ -298,9 +298,9 @@ sub untar {
             # extract as topdir
         $arch->extract();
         rename $topdir, $namedir or 
-            get_logger("")->logcroak("Can't rename $topdir, $namedir");
+            LOGCROAK("Can't rename $topdir, $namedir");
     } else {
-        get_logger("")->logcroak("no topdir") unless defined $topdir;
+        LOGCROAK("no topdir") unless defined $topdir;
         DEBUG "Not-so-nice archive (no topdir), extracting to subdir $topdir";
         $topdir = basename $topdir;
         rmf($topdir);
@@ -329,7 +329,7 @@ sub untar_in {
 
     local($Log::Log4perl::caller_depth) += 1;
 
-    get_logger("")->logcroak("not enough arguments") if
+    LOGCROAK("not enough arguments") if
       ! defined $tar_file or ! defined $dir;
 
     _confirm "Untarring $tar_file in $dir" or return 1;
@@ -344,7 +344,7 @@ sub untar_in {
     require Archive::Tar;
     my $arch = Archive::Tar->new("$tar_file_abs");
     $arch->extract() or 
-        get_logger("")->logcroak("Extract failed: $!");
+        LOGCROAK("Extract failed: ($!)");
     cdback();
 }
 
@@ -387,7 +387,7 @@ sub pick {
     my %files;
 
     if(@_ != 3 or ref($options) ne "ARRAY") {
-        get_logger("")->logcroak("pick called with wrong #/type of args");
+        LOGCROAK("pick called with wrong #/type of args");
     }
     
     {
@@ -399,7 +399,8 @@ sub pick {
             $files{$count} = $_;
         }
     
-        print STDERR "$prompt [$default_int]> ";
+        print STDERR "$prompt [$default_int]> "
+            or die "Couldn't write STDERR: ($!)";
         my $input = <STDIN>;
         chomp($input) if defined $input;
 
@@ -429,10 +430,12 @@ sub ask {
     local($Log::Log4perl::caller_depth) += 1;
 
     if(@_ != 2) {
-        get_logger("")->logcroak("ask() called with wrong # of args");
+        LOGCROAK("ask() called with wrong # of args");
     }
 
-    print STDERR "$prompt [$default]> ";
+    print STDERR "$prompt [$default]> "
+        or die "Couldn't write STDERR: ($!)";
+
     my $value = <STDIN>;
     chomp $value;
 
@@ -460,7 +463,7 @@ sub mkd {
     INFO "mkpath @_";
 
     mkpath @_ or 
-        get_logger("")->logcroak("Cannot mkdir @_ ($!)");
+        LOGCROAK("Cannot mkdir @_ ($!)");
 }
 
 =pod
@@ -488,7 +491,7 @@ sub rmf {
     INFO "rmtree @_";
 
     rmtree $_[0] or 
-        get_logger("")->logcroak("Cannot rmtree $_[0] ($!)");
+        LOGCROAK("Cannot rmtree $_[0] ($!)");
 }
 
 =pod
@@ -513,9 +516,16 @@ sub cd {
     my $opts = { stack_update => 1 };
     $opts = $_[1] if ref $_[1] eq "HASH";
 
-    push @DIR_STACK, getcwd() if $opts->{stack_update};
+    if ($opts->{stack_update}) {
+        my $cwd = getcwd();
+        if(! defined $cwd) {
+            LOGCROAK("Cannot getcwd ($!)");        ;
+        }
+        push @DIR_STACK, $cwd;
+    }
+
     chdir($_[0]) or 
-        get_logger("")->logcroak("Cannot cd $_[0] ($!)");
+        LOGCROAK("Cannot cd $_[0] ($!)");
 }
 
 =pod
@@ -532,9 +542,13 @@ sub cdback {
 
     local($Log::Log4perl::caller_depth) += 1;
 
-    get_logger("")->logcroak("cd stack empty") unless @DIR_STACK;
+    LOGCROAK("cd stack empty") unless @DIR_STACK;
 
     my $old_dir = pop @DIR_STACK;
+
+    LOGCROAK("Directory stack empty")
+        if ! defined $old_dir;
+
     INFO "cdback to $old_dir";
     cd($old_dir, {stack_update => 0});
 }
@@ -558,7 +572,7 @@ sub make {
     INFO "make @_";
 
     system("make @_") and 
-        get_logger("")->logcroak("Cannot make @_ ($!)");
+        LOGCROAK("Cannot make @_ ($!)");
 }
 
 =pod
@@ -573,7 +587,7 @@ sub check_zlib {
     if($tar_file =~ /\.tar\.gz\b|\.tgz\b/ and
        !Log::Log4perl::Util::module_available("IO::Zlib")) {
 
-        get_logger("")->logcroak("$tar_file: Compressed tarballs can ",
+        LOGCROAK("$tar_file: Compressed tarballs can ",
                "only be processed with IO::Zlib installed.");
     }
 }
@@ -602,8 +616,8 @@ sub archive_sniff {
     my $tar = Archive::Tar->new($name);
 
     my @names = $tar->list_files(["name"]);
-
-    get_logger("")->logcroak("Archive $name is empty") unless @names;
+    
+    LOGCROAK("Archive $name is empty") unless @names;
 
     (my $archdir = $names[0]) =~ s#/.*##;
 
@@ -656,7 +670,7 @@ sub pie {
         my $out = "";
 
         open FILE, "<$file" or 
-            get_logger("")->logcroak("Cannot open $file ($!)");
+            LOGCROAK("Cannot open $file ($!)");
         while(<FILE>) {
             $out .= $coderef->($_);
         }
@@ -696,7 +710,7 @@ sub plough {
         my $out = "";
 
         open FILE, "<$file" or 
-            get_logger("")->logcroak("Cannot open $file ($!)");
+            LOGCROAK("Cannot open $file ($!)");
         while(<FILE>) {
             $coderef->($_);
         }
@@ -730,7 +744,7 @@ sub slurp {
     if($from_file) {
         INFO "Slurping data from $file";
         open FILE, "<$file" or 
-            get_logger("")->logcroak("Cannot open $file ($!)");
+            LOGCROAK("Cannot open $file ($!)");
         $data = <FILE>;
         close FILE;
         DEBUG "Read ", snip($data, $DATA_SNIPPED_LEN), " from $file";
@@ -767,9 +781,13 @@ sub blurt {
 
     open FILE, ">" . ($append ? ">" : "") . $file 
         or 
-        get_logger("")->logcroak("Cannot open $file for writing ($!)");
-    print FILE $data;
-    close FILE;
+        LOGCROAK("Cannot open $file for writing ($!)");
+    print FILE $data
+        or 
+        LOGCROAK("Cannot write to $file ($!)");        
+    close FILE
+        or 
+        LOGCROAK("Cannot close $file ($!)");        
 
     DEBUG "Wrote ", snip($data, $DATA_SNIPPED_LEN), " to $file";
 }
@@ -880,7 +898,7 @@ sub tap {
     INFO "tapping $cmd";
 
     open PIPE, $cmd or 
-        get_logger("")->logcroak("open $cmd | failed ($!)");
+        LOGCROAK("open $cmd | failed ($!)");
     my $stdout = join '', <PIPE>;
     close PIPE;
 
@@ -1064,7 +1082,7 @@ sub perm_cp {
 
     _confirm "perm_cp @_" or return 1;
 
-    get_logger("")->logcroak("usage: perm_cp src dst ...") if @_ < 2;
+    LOGCROAK("usage: perm_cp src dst ...") if @_ < 2;
 
     my $perms = perm_get($_[0]);
     perm_set($_[1], $perms);
@@ -1089,7 +1107,7 @@ sub perm_get {
 
     my @stats = (stat $filename)[2,4,5] or
         
-        get_logger("")->logcroak("Cannot stat $filename ($!)");
+        LOGCROAK("Cannot stat $filename ($!)");
 
     INFO "perm_get $filename (@stats)";
 
@@ -1117,10 +1135,10 @@ sub perm_set {
 
     chown($perms->[1], $perms->[2], $filename) or 
         
-        get_logger("")->logcroak("Cannot chown $filename ($!)");
+        LOGCROAK("Cannot chown $filename ($!)");
     chmod($perms->[0] & 07777,    $filename) or
         
-        get_logger("")->logcroak("Cannot chmod $filename ($!)");
+        LOGCROAK("Cannot chmod $filename ($!)");
 }
 
 =pod
@@ -1142,10 +1160,10 @@ sub sysrun {
 
     _confirm "sysrun: @cmds" or return 1;
 
-    get_logger("")->logcroak("usage: sysrun cmd ...") if @_ < 1;
+    LOGCROAK("usage: sysrun cmd ...") if @_ < 1;
 
     system(@cmds) and 
-        get_logger("")->logcroak("@cmds failed ($!)");
+        LOGCROAK("@cmds failed ($!)");
 }
 
 =pod
@@ -1223,9 +1241,9 @@ sub sudo_me {
     if($> != 0) {
         DEBUG "Not running as root, calling sudo $0 @$argv";
         my $sudo = bin_find("sudo");
-        get_logger("")->logcroak("Can't find sudo in PATH") unless $sudo;
+        LOGCROAK("Can't find sudo in PATH") unless $sudo;
         exec($sudo, $0, @$argv) or 
-            get_logger("")->logcroak("exec failed!");
+            LOGCROAK("exec failed!");
     }
 }
 
@@ -1273,10 +1291,10 @@ sub fs_read_open {
     local($Log::Log4perl::caller_depth) += 1;
 
     my $find = bin_find("find");
-    get_logger("")->logcroak("Cannot find 'find'") unless defined $find;
+    LOGCROAK("Cannot find 'find'") unless defined $find;
 
     my $cpio = bin_find("cpio");
-    get_logger("")->logcroak("Cannot find 'cpio'") unless defined $cpio;
+    LOGCROAK("Cannot find 'cpio'") unless defined $cpio;
 
     cd $dir;
  
@@ -1284,7 +1302,7 @@ sub fs_read_open {
 
     DEBUG "Reading from $cmd";
     open my $in, "$cmd |" or 
-        get_logger("")->logcroak("Cannot open $cmd");
+        LOGCROAK("Cannot open $cmd");
 
     cdback;
 
@@ -1312,7 +1330,7 @@ sub fs_write_open {
     local($Log::Log4perl::caller_depth) += 1;
 
     my $cpio = bin_find("cpio");
-    get_logger("")->logcroak("Cannot find 'cpio'") unless defined $cpio;
+    LOGCROAK("Cannot find 'cpio'") unless defined $cpio;
 
     mkd $dir unless -d $dir;
 
@@ -1322,7 +1340,7 @@ sub fs_write_open {
 
     DEBUG "Writing to $cmd in dir $dir";
     open my $out, "| $cmd" or 
-        get_logger("")->logcroak("Cannot open $cmd");
+        LOGCROAK("Cannot open $cmd");
 
     cdback;
 
@@ -1349,12 +1367,16 @@ sub pipe_copy {
     my $bytes = 0;
 
     INFO "Opening pipe (bufsize=$bufsize)";
-
-    while(sysread($in, my $buf, $bufsize)) {
+    my $ret;
+    while($ret = sysread($in, my $buf, $bufsize)) {
         $bytes += length $buf;
-        syswrite $out, $buf;
+        if (!defined syswrite $out, $buf) {
+            LOGCROAK("Write to pipe failed: ($!)");
+        }
     }
-
+    if (!defined $ret) {
+        LOGCROAK("Read from pipe failed: ($!)");
+    }
     INFO "Closed pipe (bufsize=$bufsize, transferred=$bytes)";
 }
 
@@ -1435,11 +1457,13 @@ sub password_read {
     use Term::ReadKey;
     ReadMode 'noecho';
     $| = 1;
-    print "$prompt";
+    print "$prompt"
+        or die "Couldn't write STDOUT: ($!)";
     my $pw = ReadLine 0;
     chomp $pw;
     ReadMode 'restore';
-    print "\n";
+    print "\n"
+        or die "Couldn't write STDOUT: ($!)";
 
     return $pw;
 }

@@ -2,6 +2,14 @@
 Revision history for Sysadm::Install
 ########################################
 
+0.29 2009/06/25
+    (ms) Greg Olszewski added proper error handling to print and 
+         pipe statements
+    (ms) Fixed up some "if $dir" cases to protect against a 
+         value of "0" in $dir.
+    (ms) Fixed up logcroak calls to use the current logger instead of 
+         the root logg
+
 0.28 2009/05/11
     (ms) Skipping fs_read_open test case if there's no cpio on 
          the target system (reported for armv5tejl-linux).

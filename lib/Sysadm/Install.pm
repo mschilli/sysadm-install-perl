@@ -6,7 +6,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 use File::Copy;
 use File::Path;
@@ -174,10 +174,6 @@ program's point of view.
 =head2 FUNCTIONS
 
 =over 4
-
-=cut
-
-=pod
 
 =item C<cp($source, $target)>
 

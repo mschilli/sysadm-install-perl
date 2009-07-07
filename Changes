@@ -2,6 +2,10 @@
 Revision history for Sysadm::Install
 ########################################
 
+0.30 (not yet released)
+    (ms) nhandler(at)ubuntu.com provided a patch to resolve pod2man errors:
+         https://rt.cpan.org/Public/Bug/Display.html?id=47525
+
 0.29 2009/06/25
     (ms) Greg Olszewski added proper error handling to print and 
          pipe statements

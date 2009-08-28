@@ -6,7 +6,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 use File::Copy;
 use File::Path;
@@ -84,6 +84,7 @@ sudo_me bin_find
 fs_read_open fs_write_open pipe_copy
 snip password_read nice_time
 def_or blurt_atomic
+is_utf8_data utf8_available
 );
 
 our %EXPORTABLE = map { $_ => 1 } @EXPORTABLE;
@@ -667,6 +668,11 @@ sub pie {
 
         open FILE, "<$file" or 
             LOGCROAK("Cannot open $file ($!)");
+
+        if( utf8_available() ) {
+            binmode FILE, ":utf8";
+        }
+
         while(<FILE>) {
             $out .= $coderef->($_);
         }
@@ -707,6 +713,11 @@ sub plough {
 
         open FILE, "<$file" or 
             LOGCROAK("Cannot open $file ($!)");
+
+        if( utf8_available() ) {
+            binmode FILE, ":utf8";
+        }
+
         while(<FILE>) {
             $coderef->($_);
         }
@@ -741,6 +752,9 @@ sub slurp {
         INFO "Slurping data from $file";
         open FILE, "<$file" or 
             LOGCROAK("Cannot open $file ($!)");
+        if( utf8_available() ) {
+            binmode FILE, ":utf8";
+        }
         $data = <FILE>;
         close FILE;
         DEBUG "Read ", snip($data, $DATA_SNIPPED_LEN), " from $file";
@@ -778,6 +792,11 @@ sub blurt {
     open FILE, ">" . ($append ? ">" : "") . $file 
         or 
         LOGCROAK("Cannot open $file for writing ($!)");
+
+    if( is_utf8_data( $data ) ) {
+        binmode FILE, ":utf8";
+    }
+
     print FILE $data
         or 
         LOGCROAK("Cannot write to $file ($!)");        
@@ -1540,6 +1559,50 @@ sub def_or($$) {
         $_[0] = $_[1];
     }
 }
+
+=item C<is_utf8_data($data)>
+
+Check if the given string has the utf8 flag turned on. Works just like 
+Encode.pm's is_utf8() function, except that it silently returns a 
+false if Encode isn't available, for example when an ancient perl 
+without proper utf8 support is used.
+
+=cut
+
+###############################################
+sub is_utf8_data {
+###############################################
+    my($data) = @_;
+
+    if( !utf8_available() ) {
+        return 0;
+    }
+
+    return Encode::is_utf8( $data );
+}
+
+=item C<utf8_check($data)>
+
+Check if we're using a perl with proper utf8 support, by verifying the
+Encode.pm module is available for loading.
+
+=cut
+
+###############################################
+sub utf8_available {
+###############################################
+
+    eval {
+        use Encode;
+    };
+
+    if($@) {
+        return 0;
+    }
+
+    return 1;
+}
+
 
 =pod
 

@@ -1,5 +1,5 @@
 ######################################################################
-    Sysadm::Install 0.30
+    Sysadm::Install 0.31
 ######################################################################
 
 NAME
@@ -446,6 +446,16 @@ DESCRIPTION
         How does it work, how does $foo get a different value, although it's
         apparently passed in by value? Modifying $_[0] within the subroutine
         is an old Perl trick to do exactly that.
+
+    "is_utf8_data($data)"
+        Check if the given string has the utf8 flag turned on. Works just
+        like Encode.pm's is_utf8() function, except that it silently returns
+        a false if Encode isn't available, for example when an ancient perl
+        without proper utf8 support is used.
+
+    "utf8_check($data)"
+        Check if we're using a perl with proper utf8 support, by verifying
+        the Encode.pm module is available for loading.
 
 AUTHOR
     Mike Schilli, <m@perlmeister.com>

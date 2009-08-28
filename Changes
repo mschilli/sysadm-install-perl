@@ -2,9 +2,11 @@
 Revision history for Sysadm::Install
 ########################################
 
-0.30 (not yet released)
+0.30 2009/08/27
     (ms) nhandler(at)ubuntu.com provided a patch to resolve pod2man errors:
          https://rt.cpan.org/Public/Bug/Display.html?id=47525
+    (ms) slurp() and blurt() now use utf8 mode by default if available
+    (ms) added utf8_available() and is_utf8_data()
 
 0.29 2009/06/25
     (ms) Greg Olszewski added proper error handling to print and 

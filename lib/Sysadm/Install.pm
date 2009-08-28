@@ -6,7 +6,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 use File::Copy;
 use File::Path;
@@ -651,12 +651,24 @@ Example:
 
 Works with one or more file names.
 
+If the files are known to contain UTF-8 encoded data, and you want it
+to be read/written as a Unicode strings, use the C<utf8> option:
+
+    pie(sub { s/foo/bar/g; $_; }, "test.dat", { utf8 => 1 });
+
 =cut
 
 ###############################################
 sub pie {
 ###############################################
     my($coderef, @files) = @_;
+
+    my $options = {};
+
+    if(defined $files[-1] and
+       ref $files[-1] eq "HASH") {
+       $options = pop @files;
+    }
 
     local($Log::Log4perl::caller_depth) += 1;
 
@@ -669,7 +681,7 @@ sub pie {
         open FILE, "<$file" or 
             LOGCROAK("Cannot open $file ($!)");
 
-        if( utf8_available() ) {
+        if( $options->{utf8} ) {
             binmode FILE, ":utf8";
         }
 
@@ -678,7 +690,7 @@ sub pie {
         }
         close FILE;
 
-        blurt($out, $file);
+        blurt($out, $file, $options);
     }
 }
 
@@ -696,12 +708,24 @@ Example:
 
 Works with one or more file names.
 
+If the files are known to contain UTF-8 encoded data, and you want it
+to be read into Unicode strings, use the C<utf8> option:
+
+    plough(sub { print if /foobar/ }, "test.dat", { utf8 => 1 });
+
 =cut
 
 ###############################################
 sub plough {
 ###############################################
     my($coderef, @files) = @_;
+
+    my $options = {};
+
+    if(defined $files[-1] and
+        ref $files[-1] eq "HASH") {
+        $options = pop @files;
+    }
 
     local($Log::Log4perl::caller_depth) += 1;
 
@@ -714,7 +738,7 @@ sub plough {
         open FILE, "<$file" or 
             LOGCROAK("Cannot open $file ($!)");
 
-        if( utf8_available() ) {
+        if( $options->{utf8} ) {
             binmode FILE, ":utf8";
         }
 
@@ -727,18 +751,25 @@ sub plough {
 
 =pod
 
-=item C<my $data = slurp($file)>
+=item C<my $data = slurp($file, $options)>
 
 Slurps in the file and returns a scalar with the file's content. If
 called without argument, data is slurped from STDIN or from any files
 provided on the command line (like E<lt>E<gt> operates).
+
+If the file is known to contain UTF-8 encoded data and you want to
+read it in as a Unicode string, use the C<utf8> option:
+
+    my $unicode_string = slurp( $file, {utf8 => 1} );
 
 =cut
 
 ###############################################
 sub slurp {
 ###############################################
-    my($file) = @_;
+    my($file, $options) = @_;
+
+    $options = {} unless defined $options;
 
     local($Log::Log4perl::caller_depth) += 1;
 
@@ -752,7 +783,7 @@ sub slurp {
         INFO "Slurping data from $file";
         open FILE, "<$file" or 
             LOGCROAK("Cannot open $file ($!)");
-        if( utf8_available() ) {
+        if( exists $options->{utf8} ) {
             binmode FILE, ":utf8";
         }
         $data = <FILE>;
@@ -775,25 +806,36 @@ Opens a new file, prints the data in C<$data> to it and closes the file.
 If C<$append> is set to a true value, data will be appended to the
 file. Default is false, existing files will be overwritten.
 
+If the string is a Unicode string, use the C<utf8> option:
+
+    blurt( $unicode_string, $file, {utf8 => 1} );
+
 =cut
 
 ###############################################
 sub blurt {
 ###############################################
-    my($data, $file, $append) = @_;
+    my($data, $file, $options) = @_;
+
+      # legacy signature
+    if(defined $options and ref $options eq "") {
+        $options = { append => 1 };
+    }
+
+    $options = {} unless defined $options;
 
     local($Log::Log4perl::caller_depth) += 1;
 
-    $append = 0 unless defined $append;
+    $options->{append} = 0 unless defined $options->{append};
 
-    _confirm(($append ? "Appending" : "Writing") . " " .
+    _confirm(($options->{append} ? "Appending" : "Writing") . " " .
          length($data) . " bytes to $file") or return 1;
 
-    open FILE, ">" . ($append ? ">" : "") . $file 
+    open FILE, ">" . ($options->{append} ? ">" : "") . $file 
         or 
         LOGCROAK("Cannot open $file for writing ($!)");
 
-    if( is_utf8_data( $data ) ) {
+    if( $options->{utf8} ) {
         binmode FILE, ":utf8";
     }
 
@@ -809,7 +851,7 @@ sub blurt {
 
 =pod
 
-=item C<blurt_atomic($data, $file)>
+=item C<blurt_atomic($data, $file, $options)>
 
 Write the data in $data to a file $file, guaranteeing that the operation
 will either complete fully or not at all. This is accomplished by first
@@ -817,19 +859,25 @@ writing to a temporary file which is then rename()ed to the target file.
 
 Unlike in C<blurt>, there is no C<$append> mode in C<blurt_atomic>.
 
+If the string is a Unicode string, use the C<utf8> option:
+
+    blurt_atomic( $unicode_string, $file, {utf8 => 1} );
+
 =cut
 
 ###############################################
 sub blurt_atomic {
 ###############################################
-    my($data, $file) = @_;
+    my($data, $file, $options) = @_;
 
     _confirm("Writing atomically " .
          length($data) . " bytes to $file") or return 1;
 
+    $options = {} unless defined $options;
+
     my($fh, $tmpname) = tempfile(DIR => dirname($file));
 
-    blurt($data, $tmpname);
+    blurt($data, $tmpname, $options);
 
     rename $tmpname, $file or
         LOGDIE "Can't rename $tmpname to $file";
@@ -885,6 +933,13 @@ sub tap {
 ###############################################
     my(@args) = @_;
 
+    my $options = {};
+
+    if(defined $args[-1] and
+       ref $args[-1] eq "HASH") {
+       $options = pop @args;
+    }
+
     local($Log::Log4perl::caller_depth) += 1;
 
     _confirm "tapping @args" or return 1;
@@ -914,12 +969,17 @@ sub tap {
 
     open PIPE, $cmd or 
         LOGCROAK("open $cmd | failed ($!)");
+        
+    if( $options->{utf8} ) {
+        binmode PIPE, ":utf8";
+    }
+
     my $stdout = join '', <PIPE>;
     close PIPE;
 
     my $exit_code = $?;
 
-    my $stderr = slurp($tmpfile);
+    my $stderr = slurp($tmpfile, $options);
 
     DEBUG "tap $cmd results: rc=$exit_code stderr=[$stderr] stdout=[$stdout]";
 
@@ -1301,7 +1361,9 @@ This can be used to capture a file system structure.
 ######################################
 sub fs_read_open {
 ######################################
-    my($dir) = @_;
+    my($dir, $options) = @_;
+
+    $options = {} unless defined $options;
 
     local($Log::Log4perl::caller_depth) += 1;
 
@@ -1318,6 +1380,8 @@ sub fs_read_open {
     DEBUG "Reading from $cmd";
     open my $in, "$cmd |" or 
         LOGCROAK("Cannot open $cmd");
+
+    binmode $in, ":utf8" if $options->{utf8};
 
     cdback;
 
@@ -1340,7 +1404,9 @@ with I<fs_read_open>.
 ######################################
 sub fs_write_open {
 ######################################
-    my($dir) = @_;
+    my($dir, $options) = @_;
+
+    $options = {} unless defined $options;
 
     local($Log::Log4perl::caller_depth) += 1;
 
@@ -1356,6 +1422,8 @@ sub fs_write_open {
     DEBUG "Writing to $cmd in dir $dir";
     open my $out, "| $cmd" or 
         LOGCROAK("Cannot open $cmd");
+
+    binmode $out, ":utf8" if $options->{utf8};
 
     cdback;
 

@@ -29,7 +29,7 @@ $TEST_DIR = "t" if -d 't';
 
 my $utf8file = File::Spec->catfile($TEST_DIR, "canned", "utf8.txt");
 
-my $data = slurp $utf8file;
+my $data = slurp $utf8file, {utf8 => 1};
 ok is_utf8( $data ), "slurped utf8 file data stored in utf8";
 
 use utf8;

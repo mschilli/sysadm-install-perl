@@ -1,5 +1,5 @@
 ######################################################################
-    Sysadm::Install 0.31
+    Sysadm::Install 0.32
 ######################################################################
 
 NAME
@@ -144,6 +144,11 @@ DESCRIPTION
 
         Works with one or more file names.
 
+        If the files are known to contain UTF-8 encoded data, and you want
+        it to be read/written as a Unicode strings, use the "utf8" option:
+
+            pie(sub { s/foo/bar/g; $_; }, "test.dat", { utf8 => 1 });
+
     "plough($coderef, $filename, ...)"
         Simulate "perl -ne 'do something' file". Iterates over all lines of
         all input files and calls the subroutine provided as the first
@@ -156,23 +161,41 @@ DESCRIPTION
 
         Works with one or more file names.
 
-    "my $data = slurp($file)"
+        If the files are known to contain UTF-8 encoded data, and you want
+        it to be read into Unicode strings, use the "utf8" option:
+
+            plough(sub { print if /foobar/ }, "test.dat", { utf8 => 1 });
+
+    "my $data = slurp($file, $options)"
         Slurps in the file and returns a scalar with the file's content. If
         called without argument, data is slurped from STDIN or from any
         files provided on the command line (like <> operates).
+
+        If the file is known to contain UTF-8 encoded data and you want to
+        read it in as a Unicode string, use the "utf8" option:
+
+            my $unicode_string = slurp( $file, {utf8 => 1} );
 
     "blurt($data, $file, $append)"
         Opens a new file, prints the data in $data to it and closes the
         file. If $append is set to a true value, data will be appended to
         the file. Default is false, existing files will be overwritten.
 
-    "blurt_atomic($data, $file)"
+        If the string is a Unicode string, use the "utf8" option:
+
+            blurt( $unicode_string, $file, {utf8 => 1} );
+
+    "blurt_atomic($data, $file, $options)"
         Write the data in $data to a file $file, guaranteeing that the
         operation will either complete fully or not at all. This is
         accomplished by first writing to a temporary file which is then
         rename()ed to the target file.
 
         Unlike in "blurt", there is no $append mode in "blurt_atomic".
+
+        If the string is a Unicode string, use the "utf8" option:
+
+            blurt_atomic( $unicode_string, $file, {utf8 => 1} );
 
     "($stdout, $stderr, $exit_code) = tap($cmd, @args)"
         Run a command $cmd in the shell, and pass it @args as args. Capture

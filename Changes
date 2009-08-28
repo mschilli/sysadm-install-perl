@@ -2,7 +2,11 @@
 Revision history for Sysadm::Install
 ########################################
 
-0.30 2009/08/27
+0.32 2009/08/28
+    (ms) Made utf8 handling configurable instead of sneaky capability
+         detection, after all, there's apps using different encodings.
+
+0.31 2009/08/27
     (ms) nhandler(at)ubuntu.com provided a patch to resolve pod2man errors:
          https://rt.cpan.org/Public/Bug/Display.html?id=47525
     (ms) slurp() and blurt() now use utf8 mode by default if available

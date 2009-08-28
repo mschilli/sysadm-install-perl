@@ -6,7 +6,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.32';
+our $VERSION = '0.33';
 
 use File::Copy;
 use File::Path;
@@ -1660,9 +1660,7 @@ Encode.pm module is available for loading.
 sub utf8_available {
 ###############################################
 
-    eval {
-        use Encode;
-    };
+    eval "use Encode";
 
     if($@) {
         return 0;

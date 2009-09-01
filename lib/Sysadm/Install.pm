@@ -12,7 +12,6 @@ use File::Copy;
 use File::Path;
 use Log::Log4perl qw(:easy);
 use Log::Log4perl::Util;
-use LWP::Simple;
 use File::Basename;
 use File::Spec::Functions qw(rel2abs abs2rel);
 use Cwd;
@@ -241,10 +240,19 @@ sub download {
 
     _confirm("Downloading $url => ", basename($url)) or return 1;
 
-    my $rc = getstore($url, basename($_[0]));
+    require LWP::UserAgent;
+    require HTTP::Request;
+    require HTTP::Status;
+
+    my $ua = LWP::UserAgent->new();
+    my $request = HTTP::Request->new(GET => $url);
+    my $response = $ua->request($request, basename($_[0]));
+    my $rc = $response->code();
     
-    if($rc != RC_OK) {
-        LOGCROAK("Cannot download $_[0] ($!)");
+    if($rc != HTTP::Status::RC_OK()) {
+        LOGCROAK("Cannot download $_[0] (", 
+                  $response->message(),
+                 ")");
     }
 
     return 1;

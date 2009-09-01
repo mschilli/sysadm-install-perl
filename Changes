@@ -2,9 +2,12 @@
 Revision history for Sysadm::Install
 ########################################
 
-0.33 (not yet released)
+0.33 (2009/08/31)
     (ms) utf8_available() now uses eval"" to check for Encode module, 
          Sysadm::Install therefore no longer requires Encode to be installed.
+    (ms) Got rid of LWP::Simple because of its env_proxy() call at 
+         compile time, which freaks out on env variables like "use_proxy"
+         when set to numeric values. Using LWP::UserAgent instead.
 
 0.32 2009/08/28
     (ms) Made utf8 handling configurable instead of sneaky capability

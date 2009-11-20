@@ -3,6 +3,14 @@ use ExtUtils::MakeMaker;
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
 
+my $meta_merge = {
+    META_MERGE => {
+        resources => {
+            repository  => 'http://github.com/mschilli/sysadm-install-perl',
+        },
+    }
+};
+
 eval {
     require Expect;
 };
@@ -41,11 +49,8 @@ WriteMakefile(
         Cwd             => 0,
         File::Temp      => 0.16,
                          }, # e.g., Module::Name => 1.1
-    META_MERGE          => {
-        resources       => {
-            repository  => 'http://github.com/mschilli/sysadm-install-perl',
-        },
-    },
+   
+    $ExtUtils::MakeMaker::VERSION >= 6.50 ? (%$meta_merge) : (),
     ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
       (ABSTRACT_FROM  => 'lib/Sysadm/Install.pm', # retrieve abstract from module
        AUTHOR         => 'Mike Schilli <m@perlmeister.com>') : ()),

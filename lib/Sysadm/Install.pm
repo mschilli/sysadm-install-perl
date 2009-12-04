@@ -887,6 +887,8 @@ sub blurt_atomic {
 
     blurt($data, $tmpname, $options);
 
+    close $fh;
+
     rename $tmpname, $file or
         LOGDIE "Can't rename $tmpname to $file";
 

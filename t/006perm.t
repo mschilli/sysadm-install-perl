@@ -14,12 +14,17 @@ $TEST_DIR = "t" if -d 't';
 
 ok(1, "loading ok");
 
-my $testfile = File::Spec->catfile($TEST_DIR, "test_file");
-blurt("waaaah!", $testfile);
-END { unlink $testfile, "${testfile}_2" }; 
+my $testfile = "";
 
-chmod(0755, $testfile) or die "Cannot chmod";
-cp($testfile, "${testfile}_2");
-Sysadm::Install::perm_cp($testfile, "${testfile}_2");
+SKIP: {
+  skip "Executable file perms not supported on Win32", 1 if $^O eq "MSWin32";
+  $testfile = File::Spec->catfile($TEST_DIR, "test_file");
+  blurt("waaaah!", $testfile);
+  END { unlink $testfile, "${testfile}_2" }; 
 
-ok(-x "${testfile}_2", "copied file has same permissions");
+  chmod(0755, $testfile) or die "Cannot chmod";
+  cp($testfile, "${testfile}_2");
+  Sysadm::Install::perm_cp($testfile, "${testfile}_2");
+  
+  ok(-x "${testfile}_2", "copied file has same permissions");
+}

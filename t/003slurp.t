@@ -29,8 +29,11 @@ ok(-f $TMP_FILE, "$TMP_FILE exists");
 #####################################################################
 # Blurt atomically
 #####################################################################
-blurt_atomic("one\ntwo\nthree", $TMP_FILE);
-ok(-f $TMP_FILE, "$TMP_FILE exists");
+SKIP: {
+  skip "Renaming tmp files not supported on Win32", 1 if $^O eq "MSWin32";
+  blurt_atomic("one\ntwo\nthree", $TMP_FILE);
+  ok(-f $TMP_FILE, "$TMP_FILE exists");
+}
 
 #####################################################################
 # Slurp

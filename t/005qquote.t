@@ -14,22 +14,26 @@ $TEST_DIR = "t" if -d 't';
 
 ok(1, "loading ok");
 
-my $script  = 'print "$< rocks!\\n";';
-my $escaped = qquote($script, '!$'); # Escape for shell use
-my $out = `perl -e $escaped`;
+SKIP: {
+  skip "Quoting not supported on Win32", 4 if $^O eq "MSWin32";
 
-is($out, "$< rocks!\n", "simple escape");
-
-$escaped = qquote($script, '!$][)('); # Escape for shell use
-
-    # shell escape
-$escaped = qquote('[some]$thing(weird)"`', ":shell");
-is($escaped, '"[some]\\$thing(weird)\\"\\`"', ":shell");
-
-    # single quote
-$escaped = quote("[some]\$thing(weird)'`");
-is($escaped, "'[some]\$thing(weird)\\'`'", "single quote");
-
-    # single quote containing single quote
-$escaped = quote("foo'bar", ":shell");
-is($escaped, "'foo'\\''bar'", "foo'bar");
+  my $script  = 'print "$< rocks!\\n";';
+  my $escaped = qquote($script, '!$'); # Escape for shell use
+  my $out = `$^X -e $escaped`;
+  
+  is($out, "$< rocks!\n", "simple escape");
+  
+  $escaped = qquote($script, '!$][)('); # Escape for shell use
+  
+      # shell escape
+  $escaped = qquote('[some]$thing(weird)"`', ":shell");
+  is($escaped, '"[some]\\$thing(weird)\\"\\`"', ":shell");
+  
+      # single quote
+  $escaped = quote("[some]\$thing(weird)'`");
+  is($escaped, "'[some]\$thing(weird)\\'`'", "single quote");
+  
+      # single quote containing single quote
+  $escaped = quote("foo'bar", ":shell");
+  is($escaped, "'foo'\\''bar'", "foo'bar");
+}

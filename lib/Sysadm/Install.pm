@@ -1345,7 +1345,11 @@ sub bin_find {
 ######################################
     my($exe) = @_;
 
-    for my $path (split /:/, $ENV{PATH}) {
+    require Config;
+    my $path_sep = ":";
+    $path_sep = $Config::Config{path_sep} if defined $Config::Config{path_sep};
+
+    for my $path (split /$path_sep/, $ENV{PATH}) {
         my $full = File::Spec->catfile($path, $exe);
 
         return $full if -x $full;

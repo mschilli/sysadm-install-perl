@@ -4,6 +4,7 @@ Revision history for Sysadm::Install
 
 0.34  (not yet released)
     (ms) Added github repository link to Makefile.PL
+    (ms) [RT 53324] bin_find fix for Windows using $Config::Config{path_sep}
 
 0.33 (2009/09/12)
     (ms) utf8_available() now uses eval"" to check for Encode module, 

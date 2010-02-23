@@ -2,6 +2,10 @@
 Revision history for Sysadm::Install
 ########################################
 
+0.35  (not yet released)
+    (ms) [RT 54885] Merged with github fork by Thomas Lenz, fixing 
+         blurt_atomic on Win32.
+
 0.34  (2010/02/21)
     (ms) Added github repository link to Makefile.PL
     (ms) [RT 53324] bin_find fix for Windows using $Config::Config{path_sep}

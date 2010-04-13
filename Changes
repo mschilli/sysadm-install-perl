@@ -2,10 +2,11 @@
 Revision history for Sysadm::Install
 ########################################
 
-0.35  (not yet released)
+0.35  (2010/04/13)
     (ms) [RT 54885] Merged with github fork by Thomas Lenz, fixing 
          blurt_atomic on Win32.
     (ms) Fixed local caller_depth increments
+    (ms) Fixed printable() bug masking '-'.
 
 0.34  (2010/02/21)
     (ms) Added github repository link to Makefile.PL

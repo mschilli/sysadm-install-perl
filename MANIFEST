@@ -24,6 +24,8 @@ t/011defor.t
 t/012tap.t
 t/013download.t
 t/014utf8.t
+t/015caller_level.t
+t/016printable.t
 t/canned/test.tar
 t/canned/testa.tar
 t/canned/utf8.txt

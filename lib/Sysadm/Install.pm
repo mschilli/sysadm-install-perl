@@ -84,6 +84,7 @@ fs_read_open fs_write_open pipe_copy
 snip password_read nice_time
 def_or blurt_atomic
 is_utf8_data utf8_available
+printable
 );
 
 our %EXPORTABLE = map { $_ => 1 } @EXPORTABLE;
@@ -1557,7 +1558,7 @@ sub printable {
 ###########################################
     my($data) = @_;
 
-    $data =~ s/[^ \w.;!?@#$%^&*()+\\|~`'-,><[\]{}="]/./g;
+    $data =~ s/[^ \w.;!?@#$%^&*()+\\|~`',><[\]{}="-]/./g;
     return $data;
 }
 

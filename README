@@ -1,5 +1,5 @@
 ######################################################################
-    Sysadm::Install 0.35
+    Sysadm::Install 0.36
 ######################################################################
 
 NAME
@@ -344,6 +344,19 @@ DESCRIPTION
     "perm_cp($src, $dst, ...)"
         Read the $src file's user permissions and modify all $dst files to
         reflect the same permissions.
+
+    "owner_cp($src, $dst, ...)"
+        Read the $src file/directory's owner uid and group gid and apply it
+        to $dst.
+
+        For example: copy uid/gid of the containing directory to a file
+        therein:
+
+            use File::Basename;
+
+            owner_cp( dirname($file), $file );
+
+        Usually requires root privileges, just like chown does.
 
     "$perms = perm_get($filename)"
         Read the $filename's user permissions and owner/group. Returns an

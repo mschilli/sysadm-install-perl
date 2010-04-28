@@ -2,6 +2,9 @@
 Revision history for Sysadm::Install
 ########################################
 
+0.36  (not yet released)
+    (ms) Added owner_cp() to copy uid and gid of a file or directory.
+
 0.35  (2010/04/13)
     (ms) [RT 54885] Merged with github fork by Thomas Lenz, fixing 
          blurt_atomic on Win32.

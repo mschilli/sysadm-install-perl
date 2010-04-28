@@ -6,7 +6,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.35';
+our $VERSION = '0.36';
 
 use File::Copy;
 use File::Path;
@@ -75,7 +75,7 @@ our @EXPORTABLE = qw(
 cp rmf mkd cd make 
 cdback download untar 
 pie slurp blurt mv tap 
-plough qquote quote perm_cp
+plough qquote quote perm_cp owner_cp
 perm_get perm_set
 sysrun untar_in pick ask
 hammer say
@@ -1193,6 +1193,51 @@ sub perm_cp {
 
     my $perms = perm_get($_[0]);
     perm_set($_[1], $perms);
+}
+
+=pod
+
+=item C<owner_cp($src, $dst, ...)>
+
+Read the C<$src> file/directory's owner uid and group gid and apply
+it to $dst.
+
+For example: copy uid/gid of the containing directory to a file
+therein:
+
+    use File::Basename;
+
+    owner_cp( dirname($file), $file );
+
+Usually requires root privileges, just like chown does.
+
+=cut
+
+######################################
+sub owner_cp {
+######################################
+    my($src, @dst) = @_;
+
+    local $Log::Log4perl::caller_depth =
+          $Log::Log4perl::caller_depth + 1;
+
+    _confirm "owner_cp @_" or return 1;
+
+    LOGCROAK("usage: owner_cp src dst ...") if @_ < 2;
+
+    my($uid, $gid) = (stat($src))[4,5];
+
+    if(!defined $uid or !defined $gid ) {
+        LOGCROAK("stat of $src failed: $!");
+        return undef;
+    }
+
+    if(!chown $uid, $gid, @dst ) {
+        LOGCROAK("chown of ", join(" ", @dst), " failed: $!");
+        return undef;
+    }
+
+    return 1;
 }
 
 =pod

@@ -43,7 +43,7 @@ if($@) {
 # cp
 #################################
 eval {
-    cp "///", "//x";
+    cp "Ill/go/crazy/if/this/whacko/directory/actually/exists", "//x";
 };
 
 if($@) {

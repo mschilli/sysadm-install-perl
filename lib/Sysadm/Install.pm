@@ -956,6 +956,16 @@ wrapping all args so that shell variables are interpolated properly:
 
     "ls" "/tmp/$VAR" 2>/tmp/sometempfile |
 
+Another option is "utf8" which runs the command in a terminal set to 
+UTF8.
+
+Error handling: By default, tap() won't raise an error if the command's
+return code is nonzero, indicating an error reported by the shell. If 
+bailing out on errors is requested to avoid return code checking by
+the script, use the raise_error option:
+
+    tap({raise_error => 1}, "ls", "doesn't exist");
+
 =cut
 
 ###############################################
@@ -1009,6 +1019,10 @@ sub tap {
     close PIPE;
 
     my $exit_code = $?;
+
+    if($opts{raise_error}) {
+        LOGCROAK("tap $cmd | failed ($!)");
+    }
 
     my $stderr = slurp($tmpfile, $options);
 

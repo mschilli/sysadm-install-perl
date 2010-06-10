@@ -2,8 +2,9 @@
 Revision history for Sysadm::Install
 ########################################
 
-0.36  (not yet released)
+0.36  (2010/06/09)
     (ms) Added owner_cp() to copy uid and gid of a file or directory.
+    (ms) Added raise_error option for tap()
 
 0.35  (2010/04/13)
     (ms) [RT 54885] Merged with github fork by Thomas Lenz, fixing 

@@ -427,14 +427,18 @@ DESCRIPTION
         Format the data string in $data so that it's only (roughly) $maxlen
         characters long and only contains printable characters.
 
-        If $data contains unprintable character's they are replaced by "."
-        (the dot). If $data is longer than $maxlen, it will be formatted
-        like
+        If $data is longer than $maxlen, it will be formatted like
 
             (22)[abcdef[snip=11]stuvw]
 
         indicating the length of the original string, the beginning, the
         end, and the number of 'snipped' characters.
+
+        If $data is shorter than $maxlen, it will be returned unmodified
+        (except for unprintable characters replaced, see below).
+
+        If $data contains unprintable character's they are replaced by "."
+        (the dot).
 
     "password_read($prompt)"
         Reads in a password to be typed in by the user in noecho mode. A

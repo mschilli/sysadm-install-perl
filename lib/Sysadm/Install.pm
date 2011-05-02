@@ -1573,14 +1573,19 @@ sub pipe_copy {
 Format the data string in C<$data> so that it's only (roughly) $maxlen
 characters long and only contains printable characters.
 
-If C<$data> contains unprintable character's they are replaced by 
-"." (the dot). If C<$data> is longer than C<$maxlen>, it will be
+If C<$data> is longer than C<$maxlen>, it will be
 formatted like
 
     (22)[abcdef[snip=11]stuvw]
 
 indicating the length of the original string, the beginning, the
 end, and the number of 'snipped' characters.
+
+If C<$data> is shorter than $maxlen, it will be returned unmodified 
+(except for unprintable characters replaced, see below).
+
+If C<$data> contains unprintable character's they are replaced by 
+"." (the dot).
 
 =cut
 
@@ -1590,7 +1595,7 @@ sub snip {
     my($data, $maxlen) = @_;
 
     if(length $data <= $maxlen) {
-        return lenformat($data);
+        return printable($data);
     }
 
     $maxlen = 12 if $maxlen < 12;

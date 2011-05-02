@@ -1020,7 +1020,7 @@ sub tap {
 
     my $exit_code = $?;
 
-    if($opts{raise_error}) {
+    if($opts->{raise_error}) {
         LOGCROAK("tap $cmd | failed ($!)");
     }
 

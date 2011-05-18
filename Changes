@@ -2,6 +2,10 @@
 Revision history for Sysadm::Install
 ########################################
 
+0.37  (2011/05/17)
+    (ms) [rt.cpan.org #68095] Applied fix by Kai von Thadden for
+         tap's raise_error option and added test case.
+
 0.36  (2011/05/01)
     (ms) Added owner_cp() to copy uid and gid of a file or directory.
     (ms) Added raise_error option for tap()

@@ -2,7 +2,7 @@
 Revision history for Sysadm::Install
 ########################################
 
-0.37  (2011/05/17)
+0.37  (2011/06/25)
     (ms) [rt.cpan.org #68095] Applied fix by Kai von Thadden for
          tap's raise_error option and added test case.
 

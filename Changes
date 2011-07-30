@@ -2,7 +2,7 @@
 Revision history for Sysadm::Install
 ########################################
 
-0.38  (not yet released)
+0.38  (2011/07/30)
     (ms) Fixed Win32 test in 012tap.t
 
 0.37  (2011/06/25)

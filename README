@@ -1,5 +1,5 @@
 ######################################################################
-    Sysadm::Install 0.38
+    Sysadm::Install 0.39
 ######################################################################
 
 NAME
@@ -125,7 +125,13 @@ DESCRIPTION
             cd($dir, {stack_update => 0});
 
     "cdback()"
-        chdir back to the last directory before a previous "cd".
+        chdir back to the last directory before a previous "cd". If the
+        option "reset" is set, it goes all the way back to the beginning of
+        the directory stack, i.e. no matter how many cd() calls were made in
+        between, it'll go back to the original directory:
+
+              # go all the way back
+            cdback( { reset => 1 } );
 
     "make()"
         Call "make" in the shell.

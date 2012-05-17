@@ -2,9 +2,9 @@
 Revision history for Sysadm::Install
 ########################################
 
-0.39  (not yet released)
+0.39  (2012/05/17)
     (ms) Fixed bin_find, to omit directories
-    (ms) Added cdback() with release option
+    (ms) Added cdback() with reset option
 
 0.38  (2011/07/30)
     (ms) Fixed Win32 test in 012tap.t

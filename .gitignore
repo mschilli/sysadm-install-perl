@@ -2,3 +2,5 @@ MANIFEST.bak
 Makefile
 Makefile.old
 blib
+MYMETA.yml
+MYMETA.json

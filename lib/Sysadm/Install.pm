@@ -550,18 +550,31 @@ sub cd {
 
 =item C<cdback()>
 
-chdir back to the last directory before a previous C<cd>.
+chdir back to the last directory before a previous C<cd>. If the
+option C<reset> is set, it goes all the way back to the beginning of the
+directory stack, i.e. no matter how many cd() calls were made in between,
+it'll go back to the original directory:
+
+      # go all the way back
+    cdback( { reset => 1 } );
 
 =cut
 
 ###############################################
 sub cdback {
 ###############################################
+    my( $opts ) = @_;
+
+    $opts = {} if !defined $opts;
 
     local $Log::Log4perl::caller_depth =
           $Log::Log4perl::caller_depth + 1;
 
     LOGCROAK("cd stack empty") unless @DIR_STACK;
+
+    if( $opts->{ reset } ) {
+        @DIR_STACK = ( $DIR_STACK[0] );
+    }
 
     my $old_dir = pop @DIR_STACK;
 

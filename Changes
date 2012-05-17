@@ -2,6 +2,9 @@
 Revision history for Sysadm::Install
 ########################################
 
+0.39  (not yet released)
+    (ms) Fixed bin_find, to omit directories
+
 0.38  (2011/07/30)
     (ms) Fixed Win32 test in 012tap.t
 

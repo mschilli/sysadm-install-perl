@@ -1440,7 +1440,7 @@ sub bin_find {
     for my $path (split /$path_sep/, $ENV{PATH}) {
         my $full = File::Spec->catfile($path, $exe);
 
-        return $full if -x $full;
+        return $full if -x $full and ! -d $full;
     }
 
     return undef;

@@ -148,13 +148,13 @@ Sysadm::Install - Typical installation tasks for system administrators
 =head1 DESCRIPTION
 
 Have you ever wished for your installation shell scripts to run
-reproducably, without much programming fuzz, and even with optional
+reproducibly, without much programming fuzz, and even with optional
 logging enabled? Then give up shell programming, use Perl.
 
 C<Sysadm::Install> executes shell-like commands performing typical
 installation tasks: Copying files, extracting tarballs, calling C<make>.
 It has a C<fail once and die> policy, meticulously checking the result
-of every operation and calling C<die()> immeditatly if anything fails.
+of every operation and calling C<die()> immediately if anything fails.
 
 C<Sysadm::Install> also supports a I<dry_run> mode, in which it 
 logs everything, but suppresses any write actions. Dry run mode

@@ -1,7 +1,7 @@
 use Test::More;
 
 use Sysadm::Install qw(:all);
-use Cwd;
+use Cwd qw( cwd abs_path );
 use File::Temp qw( tempdir );
 
 my $dir_a = tempdir( CLEANUP => 1 );
@@ -14,14 +14,14 @@ my $org = cwd();
 cd $dir_a;
 cd $dir_b;
 
-is cwd(), $dir_b, "dir b";
+is abs_path(), abs_path($dir_b), "dir b";
 cdback;
-is cwd(), $dir_a, "back to dir a";
+is abs_path(), abs_path($dir_a), "back to dir a";
 cdback;
-is cwd(), $org, "back to dir a";
+is abs_path(), abs_path($org), "back to dir a";
 
 cd $dir_a;
 cd $dir_b;
 
 cdback( { reset => 1 } );
-is cwd(), $org, "reset";
+is abs_path(), abs_path($org), "reset";

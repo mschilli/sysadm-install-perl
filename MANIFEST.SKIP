@@ -6,3 +6,4 @@ CVS
 MANIFEST.bak
 ^adm
 .git
+.gz$

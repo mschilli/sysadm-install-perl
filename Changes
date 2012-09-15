@@ -2,6 +2,10 @@
 Revision history for Sysadm::Install
 ########################################
 
+0.40  (2012/09/15)
+    (ms) Applied pull request by ks0608 to fix Cwd problem on Win32/Mac
+         (https://github.com/mschilli/sysadm-install-perl/pull/1)
+
 0.39  (2012/05/17)
     (ms) Fixed bin_find, to omit directories
     (ms) Added cdback() with reset option

@@ -2,6 +2,9 @@
 Revision history for Sysadm::Install
 ########################################
 
+0.41  (not yet released)
+    (ms) Added home_dir() function returning user's home directory.
+
 0.40  (2012/09/15)
     (ms) Applied pull request by ks0608 to fix Cwd problem on Win32/Mac
          (https://github.com/mschilli/sysadm-install-perl/pull/1)

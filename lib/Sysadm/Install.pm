@@ -6,7 +6,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.40';
+our $VERSION = '0.41';
 
 use File::Copy;
 use File::Path;
@@ -84,7 +84,7 @@ fs_read_open fs_write_open pipe_copy
 snip password_read nice_time
 def_or blurt_atomic
 is_utf8_data utf8_available
-printable
+printable home_dir
 );
 
 our %EXPORTABLE = map { $_ => 1 } @EXPORTABLE;
@@ -1790,6 +1790,20 @@ sub utf8_available {
     return 1;
 }
 
+=item C<home_dir()>
+
+Return the path to the home directory of the current user.
+
+=cut
+
+###############################################
+sub home_dir {
+###############################################
+
+    my( $home ) = glob "~";
+
+    return $home;
+}
 
 =pod
 

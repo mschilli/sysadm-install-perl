@@ -2,8 +2,10 @@
 Revision history for Sysadm::Install
 ########################################
 
-0.41  (not yet released)
+0.41  (2012/12/17)
     (ms) Added home_dir() function returning user's home directory.
+    (ms) tap() now supports stdout_limit and stderr_limit options to 
+         limit log verbosity
 
 0.40  (2012/09/15)
     (ms) Applied pull request by ks0608 to fix Cwd problem on Win32/Mac

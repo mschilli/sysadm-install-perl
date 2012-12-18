@@ -979,6 +979,12 @@ the script, use the raise_error option:
 
     tap({raise_error => 1}, "ls", "doesn't exist");
 
+In DEBUG mode, C<tap> logs the entire stdout/stderr output, which
+can get too verbose at times. To limit the number of bytes logged, use
+the C<stdout_limit> and C<stderr_limit> options
+
+    tap({stdout_limit => 10}, "echo", "123456789101112");
+
 =cut
 
 ###############################################
@@ -1038,6 +1044,14 @@ sub tap {
     }
 
     my $stderr = slurp($tmpfile, $options);
+
+    if( $opts->{ stdout_limit } ) {
+        $stdout = snip( $stdout, $opts->{ stdout_limit } );
+    }
+
+    if( $opts->{ stderr_limit } ) {
+        $stderr = snip( $stderr, $opts->{ stderr_limit } );
+    }
 
     DEBUG "tap $cmd results: rc=$exit_code stderr=[$stderr] stdout=[$stdout]";
 

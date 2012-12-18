@@ -29,6 +29,7 @@ t/014utf8.t
 t/015caller_level.t
 t/016printable.t
 t/017cdback.t
+t/018home.t
 t/canned/test.tar
 t/canned/testa.tar
 t/canned/utf8.txt

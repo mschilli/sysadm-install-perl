@@ -1,5 +1,5 @@
 ######################################################################
-    Sysadm::Install 0.40
+    Sysadm::Install 0.41
 ######################################################################
 
 NAME
@@ -249,6 +249,12 @@ DESCRIPTION
         code checking by the script, use the raise_error option:
 
             tap({raise_error => 1}, "ls", "doesn't exist");
+
+        In DEBUG mode, "tap" logs the entire stdout/stderr output, which can
+        get too verbose at times. To limit the number of bytes logged, use
+        the "stdout_limit" and "stderr_limit" options
+
+            tap({stdout_limit => 10}, "echo", "123456789101112");
 
     "$quoted_string = qquote($string, [$metachars])"
         Put a string in double quotes and escape all sensitive characters so
@@ -512,6 +518,9 @@ DESCRIPTION
     "utf8_check($data)"
         Check if we're using a perl with proper utf8 support, by verifying
         the Encode.pm module is available for loading.
+
+    "home_dir()"
+        Return the path to the home directory of the current user.
 
 AUTHOR
     Mike Schilli, <m@perlmeister.com>

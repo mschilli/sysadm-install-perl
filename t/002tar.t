@@ -7,6 +7,7 @@ use Test::More;
 use Sysadm::Install qw(:all);
 use File::Spec;
 use File::Path;
+use Carp;
 #use Log::Log4perl qw(:easy);
 #Log::Log4perl->easy_init($DEBUG);
 
@@ -40,7 +41,7 @@ is(readfile("test/b"), "file-b\n", "Testing file b in tar archive");
 ##############
 sub readfile {
 ##############
-    open FILE, "<$_[0]" or die "Cannot open $_[0]";
+    open FILE, "<$_[0]" or croak "Cannot open $_[0] ($!)";
     my $data = join '', <FILE>;
     close FILE;
     return $data;

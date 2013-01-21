@@ -2,6 +2,11 @@
 Revision history for Sysadm::Install
 ########################################
 
+0.42  (2013/01/20)
+    (ms) No longer silently removing directories that are in the way 
+         before untar().
+    (ms) Better error diagnosis on failing untar() tests
+
 0.41  (2012/12/17)
     (ms) Added home_dir() function returning user's home directory.
     (ms) tap() now supports stdout_limit and stderr_limit options to 

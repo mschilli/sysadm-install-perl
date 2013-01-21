@@ -298,27 +298,29 @@ sub untar {
     require Archive::Tar;
     my $arch = Archive::Tar->new($_[0]);
 
+    my @extracted = ();
+
     if($nice and $topdir eq $namedir) {
         DEBUG "Nice archive, extracting to subdir $topdir";
-        rmf($namedir);
-        $arch->extract();
+        @extracted = $arch->extract();
     } elsif($nice) {
         DEBUG "Not-so-nice archive topdir=$topdir namedir=$namedir";
-        rmf($namedir);
-        rmf($topdir);
             # extract as topdir
-        $arch->extract();
+        @extracted = $arch->extract();
         rename $topdir, $namedir or 
             LOGCROAK("Can't rename $topdir, $namedir");
     } else {
         LOGCROAK("no topdir") unless defined $topdir;
         DEBUG "Not-so-nice archive (no topdir), extracting to subdir $topdir";
         $topdir = basename $topdir;
-        rmf($topdir);
         mkd($topdir);
         cd($topdir);
-        $arch->extract();
+        @extracted = $arch->extract();
         cdback();
+    }
+
+    if( !@extracted ) {
+        LOGCROAK "Archive $_[0] was empty.";
     }
 
     return $topdir;

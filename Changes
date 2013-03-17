@@ -2,6 +2,10 @@
 Revision history for Sysadm::Install
 ########################################
 
+0.43  (2013/03/16)
+    (ms) Using binmode() now for slurp/blurt for compatibility with Win32
+         systems.
+
 0.42  (2013/01/20)
     (ms) No longer silently removing directories that are in the way 
          before untar().

@@ -6,7 +6,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.42';
+our $VERSION = '0.43';
 
 use File::Copy;
 use File::Path;
@@ -825,6 +825,7 @@ sub slurp {
         INFO "Slurping data from $file";
         open FILE, "<$file" or 
             LOGCROAK("Cannot open $file ($!)");
+        binmode FILE; # Win32 wants that
         if( exists $options->{utf8} ) {
             binmode FILE, ":utf8";
         }
@@ -877,6 +878,8 @@ sub blurt {
     open FILE, ">" . ($options->{append} ? ">" : "") . $file 
         or 
         LOGCROAK("Cannot open $file for writing ($!)");
+
+    binmode FILE; # Win32 wants that
 
     if( $options->{utf8} ) {
         binmode FILE, ":utf8";

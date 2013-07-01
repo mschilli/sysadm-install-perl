@@ -2,6 +2,9 @@
 Revision history for Sysadm::Install
 ########################################
 
+0.44  (not yet released)
+    (ms) replaced bin_find() implementation by File::Which
+
 0.43  (2013/03/16)
     (ms) Using binmode() now for slurp/blurt for compatibility with Win32
          systems.

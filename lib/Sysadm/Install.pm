@@ -10,6 +10,7 @@ our $VERSION = '0.43';
 
 use File::Copy;
 use File::Path;
+use File::Which;
 use Log::Log4perl qw(:easy);
 use Log::Log4perl::Util;
 use File::Basename;
@@ -1465,17 +1466,9 @@ sub bin_find {
 ######################################
     my($exe) = @_;
 
-    require Config;
-    my $path_sep = ":";
-    $path_sep = $Config::Config{path_sep} if defined $Config::Config{path_sep};
-
-    for my $path (split /$path_sep/, $ENV{PATH}) {
-        my $full = File::Spec->catfile($path, $exe);
-
-        return $full if -x $full and ! -d $full;
-    }
-
-    return undef;
+      # File::Which returns a list in list context, we just want the first
+      # match.
+    return scalar File::Which::which( $exe );
 }
 
 =pod

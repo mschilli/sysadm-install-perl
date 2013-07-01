@@ -44,6 +44,7 @@ WriteMakefile(
         File::Copy      => 0,
         File::Path      => 0,
         File::Basename  => 0,
+        File::Which     => 1.09,
         Term::ReadKey   => 0,
         LWP::Simple     => 0,
         Cwd             => 0,

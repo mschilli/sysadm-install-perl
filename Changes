@@ -4,6 +4,8 @@ Revision history for Sysadm::Install
 
 0.44  (not yet released)
     (ms) replaced bin_find() implementation by File::Which
+    (ms) tap() with raise_error option set now dies with stderr output, 
+         because $! isn't set on failed close().
 
 0.43  (2013/03/16)
     (ms) Using binmode() now for slurp/blurt for compatibility with Win32

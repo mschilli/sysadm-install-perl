@@ -1045,18 +1045,18 @@ sub tap {
 
     my $exit_code = $?;
 
-    if($exit_code != 0 and $opts->{raise_error}) {
-        LOGCROAK("tap $cmd | failed ($!)");
-    }
-
     my $stderr = slurp($tmpfile, $options);
-
-    if( $opts->{ stdout_limit } ) {
-        $stdout = snip( $stdout, $opts->{ stdout_limit } );
-    }
 
     if( $opts->{ stderr_limit } ) {
         $stderr = snip( $stderr, $opts->{ stderr_limit } );
+    }
+
+    if($exit_code != 0 and $opts->{raise_error}) {
+        LOGCROAK("tap $cmd | failed ($stderr)");
+    }
+
+    if( $opts->{ stdout_limit } ) {
+        $stdout = snip( $stdout, $opts->{ stdout_limit } );
     }
 
     DEBUG "tap $cmd results: rc=$exit_code stderr=[$stderr] stdout=[$stdout]";

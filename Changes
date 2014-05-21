@@ -2,7 +2,7 @@
 Revision history for Sysadm::Install
 ########################################
 
-0.44  (2014-05-20)
+0.44  (2014/05/20)
     (ms) replaced bin_find() implementation by File::Which
     (ms) tap() with raise_error option set now dies with stderr output, 
          because $! isn't set on failed close().

@@ -1562,7 +1562,7 @@ sub fs_write_open {
 =item C<pipe_copy($in, $out, [$bufsize])>
 
 Reads from $in and writes to $out, using sysread and syswrite. The
-buffer size used defaults to 4096, but can be set explicitely.
+buffer size used defaults to 4096, but can be set explicitly.
 
 =cut
 

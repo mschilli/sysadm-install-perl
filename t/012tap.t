@@ -8,7 +8,7 @@ use Sysadm::Install qw(:all);
 use File::Temp qw( tempfile );
 
 SKIP: {
-  skip "echo not supported on Win32", 2 if $^O eq "MSWin32";
+  skip "echo not supported on Win32", 5 if $^O eq "MSWin32";
   my($stdout, $stderr, $rc) = tap "echo", "'";
   is($stdout, "'\n", "single quoted tap");
 

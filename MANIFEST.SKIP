@@ -7,3 +7,4 @@ MANIFEST.bak
 ^adm
 .git
 .gz$
+MYMETA\..*

@@ -2,6 +2,9 @@
 Revision history for Sysadm::Install
 ########################################
 
+0.45  (2015/05/25)
+    (ms) Alexandr Ciornii fixed manifest and tests for the Windows platform
+
 0.44  (2014/05/20)
     (ms) replaced bin_find() implementation by File::Which
     (ms) tap() with raise_error option set now dies with stderr output, 

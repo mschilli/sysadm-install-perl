@@ -8,9 +8,9 @@ use strict;
 
 use Sysadm::Install qw(ask pick);
 
-my $name = ask("Type in your name", "Joe");
+my $name = ask("Type in your name", "Joe", {tty => 1});
 print "Your name is $name.\n";
 
-my $fruit = pick("Pick a fruit", ["apple", "pear", "pineapple"], 3);
+my $fruit = pick("Pick a fruit", ["apple", "pear", "pineapple"], 
+                 3, {tty => 1});
 print "Your picked $fruit.\n";
-

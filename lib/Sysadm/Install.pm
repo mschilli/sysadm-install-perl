@@ -6,7 +6,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.45';
+our $VERSION = '0.46';
 
 use File::Copy;
 use File::Path;
@@ -365,7 +365,7 @@ sub untar_in {
 
 =pod
 
-=item C<pick($prompt, $options, $default)>
+=item C<pick($prompt, $options, $default, $opts)>
 
 Ask the user to pick an item from a displayed list. C<$prompt>
 is the text displayed, C<$options> is a referenc to an array of
@@ -389,12 +389,15 @@ If the user enters C<1>, C<2> or C<3>, the corresponding text string
 (C<"apple">, C<"pear">, C<"pineapple"> will be returned by
 C<pick()>.
 
+If the optional C<$opts> hash has C<{ tty =E<gt> 1 }> set, then 
+the user reponse will be expected from the console, not STDIN.
+
 =cut
 
 ##################################################
 sub pick {
 ##################################################
-    my ($prompt, $options, $default) = @_;    
+    my ($prompt, $options, $default, $opts) = @_;    
 
     local $Log::Log4perl::caller_depth =
           $Log::Log4perl::caller_depth + 1;
@@ -402,23 +405,23 @@ sub pick {
     my $default_int;
     my %files;
 
-    if(@_ != 3 or ref($options) ne "ARRAY") {
+    if(@_ < 3 or ref($options) ne "ARRAY") {
         LOGCROAK("pick called with wrong #/type of args");
     }
     
     {
         my $count = 0;
 
+        my $user_prompt = "";
+
         foreach (@$options) {
-            print STDERR "[", ++$count, "] $_\n";
+            $user_prompt .= "[" . ++$count . "] $_\n";
             $default_int = $count if $count eq $default;
             $files{$count} = $_;
         }
     
-        print STDERR "$prompt [$default_int]> "
-            or die "Couldn't write STDERR: ($!)";
-        my $input = <STDIN>;
-        chomp($input) if defined $input;
+        $user_prompt .= "$prompt [$default_int]> ";
+        my $input = user_input($user_prompt, $opts);
 
         $input = $default_int if !defined $input or !length($input);
 
@@ -431,34 +434,56 @@ sub pick {
 
 =pod
 
-=item C<ask($prompt, $default)>
+=item C<ask($prompt, $default, $opts)>
 
 Ask the user to either hit I<Enter> and select the displayed default
 or to type in another string.
+
+If the optional C<$opts> hash has C<{ tty =E<gt> 1 }> set, then 
+the user reponse will be expected from the console, not STDIN.
 
 =cut
 
 ##################################################
 sub ask {
 ##################################################
-    my ($prompt, $default) = @_;    
+    my ($prompt, $default, $opts) = @_;    
+
+    $opts = {} if !defined $opts;
 
     local $Log::Log4perl::caller_depth =
           $Log::Log4perl::caller_depth + 1;
 
-    if(@_ != 2) {
+    if(@_ < 2) {
         LOGCROAK("ask() called with wrong # of args");
     }
 
-    print STDERR "$prompt [$default]> "
-        or die "Couldn't write STDERR: ($!)";
-
-    my $value = <STDIN>;
-    chomp $value;
-
+    my $value = user_input("$prompt [$default]> ", $opts);
     $value = $default if $value eq "";
 
     return $value;
+}
+
+##################################################
+sub user_input {
+##################################################
+    my ($prompt, $opts) = @_;    
+
+    $opts = {} if !defined $opts;
+
+    my $fh = *STDIN;
+    if( $opts->{ tty } ) {
+        open $fh, "<", '/dev/tty' or 
+            die "Cannot open /dev/tty ($!)";
+    }
+
+    print STDERR $prompt
+        or die "Couldn't write STDERR: ($!)";
+
+    my $input = <$fh>;
+    chomp $input if defined $input;
+
+    return $input;
 }
 
 =pod

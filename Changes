@@ -2,6 +2,10 @@
 Revision history for Sysadm::Install
 ########################################
 
+0.46  (2015/06/23)
+    (ms) ask() and pick() now support getting the user's response on the 
+         tty, instead of stdin, so they can be used from within a pipe.
+
 0.45  (2015/05/25)
     (ms) Alexandr Ciornii fixed manifest and tests for the Windows platform
 

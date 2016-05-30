@@ -1,5 +1,5 @@
 ######################################################################
-    Sysadm::Install 0.45
+    Sysadm::Install 0.47
 ######################################################################
 
 NAME
@@ -83,7 +83,7 @@ DESCRIPTION
         Untar the tarball in $tgz_file in directory $dir. Create $dir if it
         doesn't exist yet.
 
-    "pick($prompt, $options, $default)"
+    "pick($prompt, $options, $default, $opts)"
         Ask the user to pick an item from a displayed list. $prompt is the
         text displayed, $options is a referenc to an array of choices, and
         $default is the number (starting from 1, not 0) of the default item.
@@ -105,9 +105,15 @@ DESCRIPTION
         If the user enters 1, 2 or 3, the corresponding text string
         ("apple", "pear", "pineapple" will be returned by "pick()".
 
-    "ask($prompt, $default)"
+        If the optional $opts hash has "{ tty => 1 }" set, then the user
+        reponse will be expected from the console, not STDIN.
+
+    "ask($prompt, $default, $opts)"
         Ask the user to either hit *Enter* and select the displayed default
         or to type in another string.
+
+        If the optional $opts hash has "{ tty => 1 }" set, then the user
+        reponse will be expected from the console, not STDIN.
 
     "mkd($dir)"
         Create a directory of arbitrary depth, just like
@@ -433,7 +439,7 @@ DESCRIPTION
 
     "pipe_copy($in, $out, [$bufsize])"
         Reads from $in and writes to $out, using sysread and syswrite. The
-        buffer size used defaults to 4096, but can be set explicitely.
+        buffer size used defaults to 4096, but can be set explicitly.
 
     "snip($data, $maxlen)"
         Format the data string in $data so that it's only (roughly) $maxlen
@@ -452,7 +458,7 @@ DESCRIPTION
         If $data contains unprintable character's they are replaced by "."
         (the dot).
 
-    "password_read($prompt)"
+    "password_read($prompt, $opts)"
         Reads in a password to be typed in by the user in noecho mode. A
         call to password_read("password: ") results in
 
@@ -460,6 +466,9 @@ DESCRIPTION
 
         This function will switch the terminal back into normal mode after
         the user hits the 'Return' key.
+
+        If the optional $opts hash has "{ tty => 1 }" set, then the prompt
+        will be redirected to the console instead of STDOUT.
 
     "nice_time($time)"
         Format the time in a human-readable way, less wasteful than the

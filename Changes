@@ -2,6 +2,11 @@
 Revision history for Sysadm::Install
 ########################################
 
+0.47  (2016/05/29)
+    (ms) password_read() now writes the prompt to STDERR (instead of STDOUT), and
+         optionally to /dev/tty if specified. This allows for redirecting STDOUT 
+         (and even STDERR) to a file without losing the password prompt.
+
 0.46  (2015/06/23)
     (ms) ask() and pick() now support getting the user's response on the 
          tty, instead of stdin, so they can be used from within a pipe.

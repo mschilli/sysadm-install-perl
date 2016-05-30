@@ -6,7 +6,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.46';
+our $VERSION = '0.47';
 
 use File::Copy;
 use File::Path;
@@ -465,20 +465,43 @@ sub ask {
 }
 
 ##################################################
+sub user_prompt {
+##################################################
+    my ($prompt, $opts) = @_;    
+
+    $opts = {} if !defined $opts;
+
+    my $fh = *STDERR;
+    if( $opts->{ tty } ) {
+        open $fh, ">>", '/dev/tty' or 
+            die "Cannot open /dev/tty ($!)";
+    }
+
+    print $fh $prompt
+        or die "Couldn't write to $fh: ($!)";
+
+    if( $opts->{ tty } ) {
+        close $fh;
+    }
+
+    return 1;
+}
+
+##################################################
 sub user_input {
 ##################################################
     my ($prompt, $opts) = @_;    
 
     $opts = {} if !defined $opts;
 
+    user_prompt( $prompt );
+
     my $fh = *STDIN;
+
     if( $opts->{ tty } ) {
         open $fh, "<", '/dev/tty' or 
             die "Cannot open /dev/tty ($!)";
     }
-
-    print STDERR $prompt
-        or die "Couldn't write STDERR: ($!)";
 
     my $input = <$fh>;
     chomp $input if defined $input;
@@ -1678,7 +1701,7 @@ sub printable {
 
 =pod
 
-=item C<password_read($prompt)>
+=item C<password_read($prompt, $opts)>
 
 Reads in a password to be typed in by the user in noecho mode.
 A call to password_read("password: ") results in
@@ -1688,23 +1711,24 @@ A call to password_read("password: ") results in
 This function will switch the terminal back into normal mode
 after the user hits the 'Return' key.
 
+If the optional C<$opts> hash has C<{ tty =E<gt> 1 }> set, then 
+the prompt will be redirected to the console instead of STDOUT.
+
 =cut
 
 ###########################################
 sub password_read {
 ###########################################
-    my($prompt) = @_;
+    my($prompt, $opts) = @_;
 
     use Term::ReadKey;
     ReadMode 'noecho';
     $| = 1;
-    print "$prompt"
-        or die "Couldn't write STDOUT: ($!)";
+    user_prompt($prompt, $opts);
     my $pw = ReadLine 0;
     chomp $pw;
     ReadMode 'restore';
-    print "\n"
-        or die "Couldn't write STDOUT: ($!)";
+    user_prompt("\n", $opts);
 
     return $pw;
 }

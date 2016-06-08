@@ -390,7 +390,7 @@ If the user enters C<1>, C<2> or C<3>, the corresponding text string
 C<pick()>.
 
 If the optional C<$opts> hash has C<{ tty =E<gt> 1 }> set, then 
-the user reponse will be expected from the console, not STDIN.
+the user response will be expected from the console, not STDIN.
 
 =cut
 
@@ -440,7 +440,7 @@ Ask the user to either hit I<Enter> and select the displayed default
 or to type in another string.
 
 If the optional C<$opts> hash has C<{ tty =E<gt> 1 }> set, then 
-the user reponse will be expected from the console, not STDIN.
+the user response will be expected from the console, not STDIN.
 
 =cut
 

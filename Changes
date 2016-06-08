@@ -2,6 +2,10 @@
 Revision history for Sysadm::Install
 ########################################
 
+0.48  (not yet released)
+    (ms) Applied typo fix submitted by Salvatore Bonaccorso in
+         [rt.cpan.org #114826]
+
 0.47  (2016/05/29)
     (ms) password_read() now writes the prompt to STDERR (instead of STDOUT), and
          optionally to /dev/tty if specified. This allows for redirecting STDOUT 

@@ -892,10 +892,10 @@ sub slurp {
 
 =pod
 
-=item C<blurt($data, $file, $append)>
+=item C<blurt($data, $file, $options)>
 
-Opens a new file, prints the data in C<$data> to it and closes the file.
-If C<$append> is set to a true value, data will be appended to the
+Opens a new file, prints the data in C<$data> to it and closes the file.  If
+C<$options-E<gt>{append}> is set to a true value, data will be appended to the
 file. Default is false, existing files will be overwritten.
 
 If the string is a Unicode string, use the C<utf8> option:

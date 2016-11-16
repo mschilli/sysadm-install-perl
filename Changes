@@ -5,11 +5,13 @@ Revision history for Sysadm::Install
 0.48  (not yet released)
     (ms) Applied typo fix submitted by Salvatore Bonaccorso in
          [rt.cpan.org #114826]
+    (ms) Reopening stderr now after password_read prompt to tty closed it.
 
 0.47  (2016/05/29)
-    (ms) password_read() now writes the prompt to STDERR (instead of STDOUT), and
-         optionally to /dev/tty if specified. This allows for redirecting STDOUT 
-         (and even STDERR) to a file without losing the password prompt.
+    (ms) password_read() now writes the prompt to STDERR (instead of STDOUT),
+         and optionally to /dev/tty if specified. This allows for 
+         redirecting STDOUT (and even STDERR) to a file without losing 
+         the password prompt.
 
 0.46  (2015/06/23)
     (ms) ask() and pick() now support getting the user's response on the 

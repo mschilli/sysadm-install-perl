@@ -471,8 +471,11 @@ sub user_prompt {
 
     $opts = {} if !defined $opts;
 
-    my $fh = *STDERR;
+    my $fh     = *STDERR;
+    my $old_stderr;
     if( $opts->{ tty } ) {
+        open $old_stderr, ">&", \*STDERR or
+            die "Can't dup STDERR: $!";
         open $fh, ">>", '/dev/tty' or 
             die "Cannot open /dev/tty ($!)";
     }
@@ -482,6 +485,8 @@ sub user_prompt {
 
     if( $opts->{ tty } ) {
         close $fh;
+        open STDERR, ">&", $old_stderr or 
+            die "Can't reset STDERR";
     }
 
     return 1;

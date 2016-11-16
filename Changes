@@ -2,7 +2,7 @@
 Revision history for Sysadm::Install
 ########################################
 
-0.48  (not yet released)
+0.48  (2016/11/15)
     (ms) Applied typo fix submitted by Salvatore Bonaccorso in
          [rt.cpan.org #114826]
     (ms) Reopening stderr now after password_read prompt to tty closed it.
